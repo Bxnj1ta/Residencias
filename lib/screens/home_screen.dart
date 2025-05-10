@@ -8,7 +8,7 @@ class InicioScreen extends StatelessWidget {
     final localTheme = ThemeData(
       inputDecorationTheme: InputDecorationTheme(
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(30),
         ),
         filled: true,
         fillColor: Colors.grey[200],
@@ -51,6 +51,10 @@ class InicioScreen extends StatelessWidget {
                   TextField(
                     decoration: const InputDecoration(
                       hintText: 'Correo',
+                      prefixIcon:
+                          Icon(Icons.account_circle, color: Colors.grey),
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 15, horizontal: 15),
                     ),
                     keyboardType: TextInputType.emailAddress,
                   ),
@@ -59,6 +63,9 @@ class InicioScreen extends StatelessWidget {
                     obscureText: true,
                     decoration: const InputDecoration(
                       hintText: 'Contraseña',
+                      prefixIcon: Icon(Icons.lock, color: Colors.grey),
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 15, horizontal: 15),
                     ),
                   ),
                   const SizedBox(height: 5),
@@ -88,7 +95,7 @@ class InicioScreen extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(30),
                         ),
                       ),
                       child: const Text(

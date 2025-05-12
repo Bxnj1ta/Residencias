@@ -11,20 +11,20 @@ class InicioScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(30),
         ),
         filled: true,
-        fillColor: Colors.grey[300],
+        fillColor: Colors.grey[200],
       ),
     );
     return Theme(
       data: localTheme,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color.fromARGB(255, 151, 121, 191),
         body: Center(
           child: SingleChildScrollView(
             child: Container(
               width: MediaQuery.of(context).size.width * 0.80,
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 151, 121, 191),
+                color: Colors.grey[200],
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [
                   BoxShadow(
@@ -44,7 +44,6 @@ class InicioScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w400,
-                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -73,14 +72,13 @@ class InicioScreen extends StatelessWidget {
                     children: [
                       TextButton(
                         onPressed: () {
-                          // Forgot password action
                         },
                         child: const Text(
                           '¿Olvidó su contraseña?',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w400,
-                            color: Colors.white,
+                            color: Colors.black,
                           ),
                         ),
                       ),
@@ -99,13 +97,14 @@ class InicioScreen extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
-                        backgroundColor: Colors.grey[300],
+                        backgroundColor: const Color.fromARGB(255, 151, 121, 191),
                       ),
                       child: const Text(
                         'Iniciar Sesión',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w400,
+                          color: Colors.white,
                         ),
                       ),
                     ),

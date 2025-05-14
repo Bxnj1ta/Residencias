@@ -107,7 +107,7 @@ class PerfilScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: const BotonAbajoScreen(),
+      //bottomNavigationBar: const BotonAbajoScreen(),
     );
   }
 }

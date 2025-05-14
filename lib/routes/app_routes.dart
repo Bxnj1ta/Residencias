@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import '../screens/screens.dart';
 
 class AppRoutes {
-  static const initialRoute = 'home';
+  static const initialRoute = 'login';
   static Map<String, Widget Function(BuildContext)> routes = {
-    'home': (BuildContext context) => const InicioScreen(),
-    'lista': (BuildContext context) => const ListaScreen(),
+    'login': (BuildContext context) => const LoginScreen(),
+    'home': (BuildContext context) => const HomeScreen(),
+    'lista': (BuildContext context) => const DailyScreen(),
     'historial': (BuildContext context) => const HistorialScreen(),
     'mapa': (BuildContext context) => const MapaScreen(),
     'perfil': (BuildContext context) => const PerfilScreen(),

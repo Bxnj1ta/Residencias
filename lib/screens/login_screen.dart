@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class InicioScreen extends StatelessWidget {
-  const InicioScreen({super.key});
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -11,20 +11,20 @@ class InicioScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(30),
         ),
         filled: true,
-        fillColor: Colors.grey[200],
+        fillColor: Colors.grey[300],
       ),
     );
     return Theme(
       data: localTheme,
       child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 151, 121, 191),
+        backgroundColor: Colors.white,
         body: Center(
           child: SingleChildScrollView(
             child: Container(
               width: MediaQuery.of(context).size.width * 0.80,
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.grey[200],
+                color: Theme.of(context).primaryColor,
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [
                   BoxShadow(
@@ -42,8 +42,9 @@ class InicioScreen extends StatelessWidget {
                   const Text(
                     'Inicio Sesión',
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: 36,
                       fontWeight: FontWeight.w400,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -72,39 +73,40 @@ class InicioScreen extends StatelessWidget {
                     children: [
                       TextButton(
                         onPressed: () {
+                          // Forgot password action
                         },
                         child: const Text(
                           '¿Olvidó su contraseña?',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w400,
-                            color: Colors.black,
+                            color: Colors.white,
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 10),
                   SizedBox(
                     height: 60,
                     width: double.infinity,
-                    child: ElevatedButton(
+                    child: ElevatedButton( //BOTON LOGIN
                       onPressed: () {
-                        Navigator.pushNamed(context, 'lista');
+                        Navigator.pushNamed(context, 'home');
                       },
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
-                        backgroundColor: const Color.fromARGB(255, 151, 121, 191),
+                        backgroundColor: Colors.grey[300],
                       ),
-                      child: const Text(
-                        'Iniciar Sesión',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.white,
+                      child: Center(
+                        child: const Text(
+                          'Iniciar Sesión',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
                       ),
                     ),

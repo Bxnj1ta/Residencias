@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:residencias/widgets/widgets.dart';
 
-class ListaScreen extends StatelessWidget {
-  const ListaScreen({super.key});
+class DailyScreen extends StatelessWidget {
+  const DailyScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,29 +19,7 @@ class ListaScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        iconTheme: IconThemeData(color: Colors.black),
-        automaticallyImplyLeading: true,
-        title: Text(
-          'Residencias del Día',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, 'perfil');
-            },
-            icon:
-                const Icon(Icons.account_circle, size: 30, color: Colors.black),
-          ),
-        ],
-      ),
-      backgroundColor: Colors.white,
+      appBar: const CustomAppBar(titulo: 'Residencias del Día'),
       body: Column(
         children: [
           Expanded(
@@ -73,7 +51,7 @@ class ListaScreen extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: const BotonAbajoScreen(),
+      //bottomNavigationBar: const BotonAbajoScreen(),
     );
   }
 }

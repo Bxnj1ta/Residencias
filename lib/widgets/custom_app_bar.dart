@@ -11,7 +11,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      automaticallyImplyLeading: true,
+      automaticallyImplyLeading: false,
+      leading: IconButton(
+        icon: const Icon(Icons.logout), // Cambia aquí el icono que desees
+        onPressed: () {
+          Navigator.pushNamed(context, 'login');
+        },
+      ),
       elevation: 0,
       toolbarHeight: 80, 
       centerTitle: true, 

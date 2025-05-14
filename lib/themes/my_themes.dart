@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class MyTheme {
   static const Color primary = Color.fromARGB(255, 151, 121, 191);
+  static const Color secondary = Color.fromARGB(255, 234, 221, 255);
   static const String fontFamily = 'Roboto';
 
   // Tema claro

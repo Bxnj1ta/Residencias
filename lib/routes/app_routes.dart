@@ -10,7 +10,7 @@ class AppRoutes {
     'historial': (BuildContext context) => const HistorialScreen(),
     'mapa': (BuildContext context) => const MapaScreen(),
     'perfil': (BuildContext context) => const PerfilScreen(),
-    //Agregar la pantalla de detalle.
+    'detalle': (BuildContext context) => const DetalleScreen(),
   };
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {

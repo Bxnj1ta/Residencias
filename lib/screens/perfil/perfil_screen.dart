@@ -7,29 +7,7 @@ class PerfilScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        iconTheme: IconThemeData(color: Colors.black),
-        automaticallyImplyLeading: true,
-        title: Text(
-          'Perfil',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, 'perfil');
-            },
-            icon:
-                const Icon(Icons.account_circle, size: 30, color: Colors.black),
-          ),
-        ],
-      ),
-      backgroundColor: Colors.white,
+      appBar: const CustomAppBar(titulo: 'Perfil', showProfileIcon: false,showMenuIcon: false,),
       body: SingleChildScrollView(
         child: Column(
           children: [

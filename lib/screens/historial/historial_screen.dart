@@ -24,7 +24,7 @@ class HistorialScreen extends StatelessWidget {
               itemCount: residencias.length,
               itemBuilder: (context, index) {
                 return Card(
-                  color: const Color.fromARGB(255, 151, 121, 191),
+                  color: const Color.fromARGB(255, 219, 199, 245),
                   margin:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   shape: RoundedRectangleBorder(

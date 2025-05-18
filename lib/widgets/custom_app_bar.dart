@@ -2,34 +2,48 @@ import 'package:flutter/material.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String titulo;
+  final bool showProfileIcon;
+  final bool showMenuIcon;
 
   const CustomAppBar({
     super.key,
     required this.titulo,
+    this.showProfileIcon = true,
+    this.showMenuIcon = true,
   });
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       automaticallyImplyLeading: false,
-      leading: IconButton(
-        icon: const Icon(Icons.logout), // Cambia aquí el icono que desees
-        onPressed: () {
-          Navigator.pushNamed(context, 'login');
-        },
-      ),
+      leading: showMenuIcon
+          ? Padding(
+            padding: const EdgeInsets.only(left: 12),
+            child: IconButton(
+                icon: const Icon(Icons.menu, size: 30),
+                onPressed: () {
+                  // ABRIR DRAWER
+                },
+              ),
+          )
+          : null,
       elevation: 0,
       toolbarHeight: 80, 
       centerTitle: true, 
       title: Text(titulo),
       actions: [
         Padding(
-          padding: const EdgeInsets.only(right: 12, top: 8),
+          padding: const EdgeInsets.only(right: 12),
           child: IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, 'perfil');
+              showProfileIcon
+                ? Navigator.pushNamed(context, 'perfil')
+                : Navigator.of(context).pop();
             },
-            icon: const Icon(Icons.account_circle, size: 30),
+            icon: Icon(
+              showProfileIcon 
+              ? Icons.account_circle 
+              : Icons.close,size: 30,),
           ),
         ),
       ],

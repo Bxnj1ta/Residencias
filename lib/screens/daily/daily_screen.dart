@@ -27,7 +27,7 @@ class DailyScreen extends StatelessWidget {
               itemCount: residencias.length,
               itemBuilder: (context, index) {
                 return Card(
-                  color: const Color.fromARGB(255, 151, 121, 191),
+                  color: const Color.fromARGB(255, 184, 130, 255),
                   margin:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   shape: RoundedRectangleBorder(
@@ -37,9 +37,9 @@ class DailyScreen extends StatelessWidget {
                         //Color amarillo para estados "en proceso", rojo para estados "pendiente"
                         size: 34,
                         color: Colors.yellow),
-                    title: Text(residencias[index]['distancia']!),
-                    subtitle: Text(residencias[index]['direccion']!),
-                    trailing: const Icon(Icons.chevron_right),
+                    title: Text(residencias[index]['distancia']!, style: TextStyle(color: const Color.fromARGB(255, 223, 223, 223), fontWeight: FontWeight.bold)),
+                    subtitle: Text(residencias[index]['direccion']!, style: TextStyle(color: Color.fromARGB(255, 223, 223, 223))),
+                    trailing: const Icon(Icons.chevron_right, color: Color.fromARGB(255, 223, 223, 223)),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                     onTap: () {
                       Navigator.pushNamed(context, 'detalle');
@@ -51,7 +51,6 @@ class DailyScreen extends StatelessWidget {
           ),
         ],
       ),
-      //bottomNavigationBar: const BotonAbajoScreen(),
     );
   }
 }

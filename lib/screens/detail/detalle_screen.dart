@@ -19,21 +19,13 @@ class _ResidenciaDetalleScreenState extends State<ResidenciaDetalleScreen> {
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
         child: Container(
           padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 136, 85, 203),
-            border: Border.all(color: const Color.fromARGB(255, 151, 121, 191)),
-            borderRadius: BorderRadius.circular(20),
-          ),
+          decoration: _cardDecoration(const Color.fromARGB(255, 136, 85, 203)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 height: 250,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: const Color.fromARGB(255, 151, 121, 191)),
-                  borderRadius: BorderRadius.circular(20),
-                ),
+                decoration: _cardDecoration(Colors.white),
                 child: const Center(
                   child: Text('Colocar mapa'),
                 ),
@@ -125,3 +117,8 @@ class _ResidenciaDetalleScreenState extends State<ResidenciaDetalleScreen> {
     );
   }
 }
+BoxDecoration _cardDecoration(color) => BoxDecoration(
+            color: color,
+            border: Border.all(color: const Color.fromARGB(255, 151, 121, 191)),
+            borderRadius: BorderRadius.circular(20),
+          );

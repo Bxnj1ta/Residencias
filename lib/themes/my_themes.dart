@@ -7,8 +7,8 @@ class MyTheme {
 
   // Tema claro
   static final ThemeData light = ThemeData(
-    primaryColor: primary,
     brightness: Brightness.light,
+    primaryColor: primary,
     fontFamily: fontFamily,
     scaffoldBackgroundColor: Colors.white,
 
@@ -39,8 +39,8 @@ class MyTheme {
 
   // Tema oscuro
   static final ThemeData dark = ThemeData(
-    primaryColor: primary,
     brightness: Brightness.dark,
+    primaryColor: primary,
     fontFamily: fontFamily,
     scaffoldBackgroundColor: const Color.fromARGB(255, 38, 38, 38),
     appBarTheme: const AppBarTheme(

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:residencias/mocks/mock_residencias.dart'; //LISTA DEMO
+import 'package:provider/provider.dart';
+import 'package:residencias/mocks/mock_residencias.dart';
+import 'package:residencias/providers/providers.dart'; //LISTA DEMO
 
 
 class MapaResidencias extends StatefulWidget {
-  const MapaResidencias({super.key});
+  const MapaResidencias({
+    super.key
+    });
 
   @override
   State<MapaResidencias> createState() => _MapaResidenciasState();
@@ -14,48 +17,29 @@ class MapaResidencias extends StatefulWidget {
 
 class _MapaResidenciasState extends State<MapaResidencias> {
   String? _mapStyle;
-  // GoogleMapController? _mapController;
-  LatLng? _miUbicacion;
   Set<Marker> _marcadores = {};
-
-  // LISTA MOCK DEL BACKEND
-  final List<Map<String, dynamic>> _residencias = mockResidencias;
+  final List<Map<String, dynamic>> _residencias = mockResidencias; // LISTA MOCK DEL BACKEND
 
   @override
   void initState() {
     super.initState();
     _cargarEstiloMapa();
-    _obtenerUbicacion();
   }
 
   Future<void> _cargarEstiloMapa() async { //da estilo al mapa
     _mapStyle = await rootBundle.loadString('lib/assets/map/map_style.txt');
+    setState(() {});
   }
 
-  Future<void> _obtenerUbicacion() async { //Pide permisos -> obtiene ubicacion -> cambia el estado
-    //Pide permisos
-    bool permiso = await Geolocator.requestPermission() != LocationPermission.denied;
-    if (!permiso) return;
-    //obtiene ubicacion
-    final posicion = await Geolocator.getCurrentPosition();
-    //cambia el estado
-    if (!mounted) return; //por si cierra la pantalla antes de que se obtenga la ubicacion
-    setState(() {
-      _miUbicacion = LatLng(posicion.latitude, posicion.longitude);
-      _crearMarcadores();
-    });
-  }
-
-  void _crearMarcadores() { //agrega a la lista de marcadores: las residencias y la ubicacion
+  void _crearMarcadores(LatLng miUbicacion) { //mi Ubicacion y las residencias del user (POR AHORA SOLO MOCK)
     final Set<Marker> nuevos = {
       Marker(
         markerId: const MarkerId('yo'),
-        position: _miUbicacion!,
+        position: miUbicacion,
         infoWindow: const InfoWindow(title: 'Mi ubicación'),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
       ),
     };
-
     for (var r in _residencias) {
       nuevos.add(
         Marker(
@@ -69,19 +53,24 @@ class _MapaResidenciasState extends State<MapaResidencias> {
         ),
       );
     }
-
     _marcadores = nuevos;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_miUbicacion == null) {
+    final ubicacionProvider = Provider.of<UbicacionProvider>(context);
+    final posicion = ubicacionProvider.posicion;
+    
+    if (posicion == null || _mapStyle == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
+    final LatLng miUbicacion = LatLng(posicion.latitude, posicion.longitude);
+    _crearMarcadores(miUbicacion);
+
     return GoogleMap(
         initialCameraPosition: CameraPosition(
-          target: _miUbicacion!,
+          target: miUbicacion,
           zoom: 15,
           tilt: 0,
         ),
@@ -92,7 +81,7 @@ class _MapaResidenciasState extends State<MapaResidencias> {
         buildingsEnabled: false,
         mapType: MapType.normal,
         tiltGesturesEnabled: false,
-        
+
       );
   }
 }

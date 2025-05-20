@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:residencias/providers/providers.dart';
+import 'package:provider/provider.dart';
 import 'screens.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -10,6 +12,16 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 1; //lo primero que muestra es el menu inicio
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      if(!mounted) return;
+      Provider.of<UbicacionProvider>(context, listen: false).obtenerUbicacion();
+    }
+    );
+  }
 
   //POR SI DSP TENEMO QUE CAMBIAR LAS PAGINAS
   static final List<Widget> _pages = <Widget>[

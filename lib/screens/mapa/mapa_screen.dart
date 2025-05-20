@@ -7,6 +7,7 @@ class MapaScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: const CustomAppBar(titulo: 'Residencias cercanas'),
       body: SafeArea(
         child: Container(
           padding: const EdgeInsets.all(15),

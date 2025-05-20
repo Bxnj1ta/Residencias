@@ -9,7 +9,7 @@ class DetalleScreen extends StatelessWidget {
     final Map<String, dynamic> residencia = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
     return Scaffold(
-      appBar: const CustomAppBar(titulo: 'Residencias del Día',showProfileIcon: false,showMenuIcon: false,),
+      appBar: const CustomAppBar(titulo: 'Residencias del Día', showDrawer: false, showRightIcon: false,),
       body: SafeArea(
         child: Container(
           padding: const EdgeInsets.all(15),

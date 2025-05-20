@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class MapaBase extends StatefulWidget {
+class MapaBase extends StatelessWidget {
   final Set<Marker> marcadores;
-  final LatLng miUbicacion;
+  final LatLng centerPosition;
   final String? mapStyle;
   final Function(GoogleMapController)? onMapCreated;
   final double zoom;
@@ -12,19 +12,26 @@ class MapaBase extends StatefulWidget {
   const MapaBase({
     super.key,
     required this.marcadores,
-    required this.miUbicacion,
+    required this.centerPosition,
     this.mapStyle,
     this.onMapCreated,
     this.zoom = 15,
     });
 
   @override
-  State<MapaBase> createState() => _MapaBaseState();
-}
-
-class _MapaBaseState extends State<MapaBase> {
-  @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return GoogleMap(
+      initialCameraPosition: CameraPosition(
+        target: centerPosition,
+        zoom: zoom,
+        tilt: 0,
+        ),
+      markers: marcadores,
+      myLocationEnabled: false,
+      style: mapStyle,
+      buildingsEnabled: false,
+      mapType: MapType.normal,
+      tiltGesturesEnabled: false,
+    );
   }
 }

@@ -6,15 +6,16 @@ class DetalleScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Map<String, dynamic> residencia = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    // final Map<String, dynamic> residencia = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
     return Scaffold(
       appBar: const CustomAppBar(titulo: 'Residencias del Día', showDrawer: false, showRightIcon: false,),
       body: SafeArea(
         child: Container(
           padding: const EdgeInsets.all(15),
-          child: MapaDetalle(residencia: residencia))
+          child: Placeholder()
         ),
+      ),
     );
   }
 }

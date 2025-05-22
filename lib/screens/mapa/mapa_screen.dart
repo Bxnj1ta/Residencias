@@ -8,11 +8,7 @@ class MapaScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(titulo: 'Residencias cercanas'),
-      body: SafeArea(
-        child: Container(
-          padding: const EdgeInsets.all(15),
-          child: MapaResidencias())
-        ),
+      body: MapaResidencias(),
     );
   }
 }

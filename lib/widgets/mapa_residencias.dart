@@ -1,87 +1,153 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:provider/provider.dart';
+import 'package:geolocator/geolocator.dart' as gl;
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mp;
 import 'package:residencias/mocks/mock_residencias.dart';
-import 'package:residencias/providers/providers.dart'; //LISTA DEMO
-
 
 class MapaResidencias extends StatefulWidget {
-  const MapaResidencias({
-    super.key
-    });
+  const MapaResidencias({super.key});
 
   @override
   State<MapaResidencias> createState() => _MapaResidenciasState();
 }
 
 class _MapaResidenciasState extends State<MapaResidencias> {
-  String? _mapStyle;
-  Set<Marker> _marcadores = {};
-  final List<Map<String, dynamic>> _residencias = mockResidencias; // LISTA MOCK DEL BACKEND
+  mp.MapboxMap? mapboxMapController;
+  List<Map<String,dynamic>> residenciasUsuario = [];
+  gl.Position? _position;
+  StreamSubscription<gl.Position>? userPositionStream;
+  mp.PointAnnotationManager? _pointAnnotationManager;
 
   @override
   void initState() {
     super.initState();
-    _cargarEstiloMapa();
+    _obtenerResidencias();
+    _positionTracking();
   }
-
-  Future<void> _cargarEstiloMapa() async { //da estilo al mapa
-    _mapStyle = await rootBundle.loadString('lib/assets/map/map_style.txt');
-    setState(() {});
+  @override
+  void dispose() {
+    userPositionStream?.cancel();
+    _pointAnnotationManager?.deleteAll();
+    super.dispose();
   }
+  //revisa permisos y servicio de ubicación
+  Future<bool> _checkServicioYPermiso() async {
+    if(!await gl.Geolocator.isLocationServiceEnabled()) {
+      return Future.error('Servicio de ubicación está desactivado.');
+    }
+    var permission = await gl.Geolocator.checkPermission();
+    if (permission == gl.LocationPermission.denied) {
+      permission = await gl.Geolocator.requestPermission();
+      if (permission == gl.LocationPermission.denied) {
+        return Future.error('Permiso de ubicacion denegado.');
+      }
+    }
+    if (permission == gl.LocationPermission.deniedForever) {
+      return Future.error('Permiso de ubicación denegado permanentemente.');
+    }
+    return true;
+  }
+  //permisos y servicios -> ubicacion inicial -> escuchar cambios en la ubicacion
+  Future<void> _positionTracking() async {
+    try {
+      //1. resvisa si tiene servicio activado y permisos concedidos.
+      await _checkServicioYPermiso();
+      //2. con esto el mapa se abre centrado en la posicion actual.
+      _position = await gl.Geolocator.getCurrentPosition();
+      setState(() {});
+      //3. cómo cambia la camara y cuando.
+      final settings = gl.LocationSettings(
+        accuracy: gl.LocationAccuracy.high,
+        distanceFilter: 100,
+      );
+      userPositionStream?.cancel();//por si ya habia uno.
+      userPositionStream = gl.Geolocator
+        .getPositionStream(locationSettings: settings)
+        .listen(_actualizarUbicacion);
+    } catch (e) {
+      debugPrint("Error en rastreo de posición: $e");
+    }
+  }
+  //centra la camara en la ubicacion actualizada cada vez que se sale del frame
+  Future<void> _actualizarUbicacion(gl.Position position) async {
+    if (mapboxMapController == null) return;
 
-  void _crearMarcadores(LatLng miUbicacion) { //mi Ubicacion y las residencias del user (POR AHORA SOLO MOCK)
-    final Set<Marker> nuevos = {
-      Marker(
-        markerId: const MarkerId('yo'),
-        position: miUbicacion,
-        infoWindow: const InfoWindow(title: 'Mi ubicación'),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
-      ),
-    };
-    for (var r in _residencias) {
-      nuevos.add(
-        Marker(
-          markerId: MarkerId(r['id'].toString()),
-          position: LatLng(r['lat'], r['lng']),
-          infoWindow: InfoWindow(
-            title: r['nombre'],
-            snippet: r['direccion'],
-            onTap: () => Navigator.pushNamed(context, 'detalle', arguments: r),
-          ),
-        ),
+    final cameraState = await mapboxMapController!.getCameraState();
+    final cameraOptions = cameraState.toCameraOptions();
+    final bounds = await mapboxMapController!.coordinateBoundsForCamera(cameraOptions);
+    final pos = mp.Position(position.longitude, position.latitude);
+
+    final inViewport = pos.lng >= bounds.southwest.coordinates.lng &&
+                      pos.lng <= bounds.northeast.coordinates.lng &&
+                      pos.lat >= bounds.southwest.coordinates.lat &&
+                      pos.lat <= bounds.northeast.coordinates.lat;
+
+    if (!inViewport) {
+      mapboxMapController?.flyTo(
+        mp.CameraOptions(center: mp.Point(coordinates: pos), zoom: 14),
+        mp.MapAnimationOptions(duration: 1000),//ms
       );
     }
-    _marcadores = nuevos;
+  }
+  //carga lista de residencias del usuario
+  void _obtenerResidencias() {
+    residenciasUsuario = mockResidencias;
+  }
+  //activa el puck y controlador
+  void _onMapCreated(mp.MapboxMap controller) async {
+    mapboxMapController = controller;
+    //muestra el puck en el mapa
+    mapboxMapController?.location.updateSettings(
+      mp.LocationComponentSettings(enabled: true)
+    );
+  }
+  //muestra los marcadores al cagar el mapa
+  void _onMapLoaded(mp.MapLoadedEventData _) {
+    agregarMarcadores();
+  }
+  //agregar marcadores a partir de residenciasUsuario
+  Future<void> agregarMarcadores() async {
+    return Future.delayed(Duration(milliseconds: 500), () async {
+    try {
+      await _pointAnnotationManager?.deleteAll();//limpia anotaciones previas
+      _pointAnnotationManager = await mapboxMapController?.annotations.createPointAnnotationManager();
+      final Uint8List imageData = await cargarIconoMarcador();
+
+      mp.PointAnnotationOptions pointAnnotationOptions = mp.PointAnnotationOptions(
+        image: imageData,
+        iconSize: 0.2,
+        geometry: mp.Point(coordinates: mp.Position(-70.61067676151647, -33.42936938276679)),
+      );
+
+      await _pointAnnotationManager?.create(pointAnnotationOptions);
+    } catch (e) {
+      debugPrint("Error al cargar marcador: $e");
+    }
+  });
+  }
+  //carga iconos que se usarán
+  Future<Uint8List> cargarIconoMarcador() async {
+    var byteData = await rootBundle.load("lib/assets/icons/marker.png");
+    return byteData.buffer.asUint8List();
   }
 
   @override
   Widget build(BuildContext context) {
-    final ubicacionProvider = Provider.of<UbicacionProvider>(context);
-    final posicion = ubicacionProvider.posicion;
-    
-    if (posicion == null || _mapStyle == null) {
+    if (_position == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final LatLng miUbicacion = LatLng(posicion.latitude, posicion.longitude);
-    _crearMarcadores(miUbicacion);
-
-    return GoogleMap(
-        initialCameraPosition: CameraPosition(
-          target: miUbicacion,
-          zoom: 15,
-          tilt: 0,
+    return mp.MapWidget(
+      onMapCreated: _onMapCreated,
+      onMapLoadedListener: _onMapLoaded,
+      styleUri: mp.MapboxStyles.LIGHT,
+      cameraOptions: mp.CameraOptions(
+        center: mp.Point(
+          coordinates: mp.Position(_position!.longitude, _position!.latitude),
         ),
-        markers: _marcadores,
-        myLocationEnabled: false,
-        // onMapCreated: (controller) => _mapController = controller,
-        style: _mapStyle,
-        buildingsEnabled: false,
-        mapType: MapType.normal,
-        tiltGesturesEnabled: false,
-
-      );
+        zoom: 14,
+      ),
+    );
   }
 }

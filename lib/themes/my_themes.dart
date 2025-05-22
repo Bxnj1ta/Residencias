@@ -1,67 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:residencias/themes/themes.dart';
 
 class MyTheme {
-  static const Color primary = Color.fromARGB(255, 151, 121, 191);
-  static const Color secondary = Color.fromARGB(255, 234, 221, 255);
-  static const String fontFamily = 'Roboto';
+  MyTheme._();
+    static const MaterialColor primary = Colors.grey;
+    static final Color light1 = primary.shade50;
+    static final Color light2 = primary.shade200;
+    static final Color light3 = primary.shade400;
+    static final Color dark1 = primary.shade900;
+    static final Color dark2 = primary.shade800;
+    static final Color dark3 = primary.shade600;
 
-  // Tema claro
-  static final ThemeData light = ThemeData(
+  static ThemeData light = ThemeData(
+    useMaterial3: true,
+    fontFamily: 'Poppins',
     brightness: Brightness.light,
-    primaryColor: primary,
-    fontFamily: fontFamily,
+    primaryColor: light1,
+    primaryColorLight: light1,
+    primaryColorDark: dark1,
     scaffoldBackgroundColor: Colors.white,
-
-    appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.white,
-      iconTheme: IconThemeData(color: Colors.black),
-      titleTextStyle: TextStyle(
-        color: Colors.black,
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
-      ),
-      elevation: 20,
-    ),
-
-    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      backgroundColor: Colors.white,
-      selectedItemColor: primary,
-      unselectedItemColor: Colors.grey,
-    ),
-
-    textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(foregroundColor: primary),
-    ),
-
-    floatingActionButtonTheme:
-      const FloatingActionButtonThemeData(backgroundColor: primary),
+    textTheme: MyTextTheme.light,
+    appBarTheme: MyAppBarTheme.light,
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(backgroundColor: Colors.white),
+    cardTheme: CardTheme(color: light2,),
+    inputDecorationTheme: MyInputTheme.light,
+    textSelectionTheme: TextSelectionThemeData(cursorColor: dark1),
+    iconTheme: IconThemeData(color: Colors.black),
+    buttonTheme: MyButtonTheme.light,
+    elevatedButtonTheme: MyElevatedButtonTheme.light,
+    splashColor: light1,
   );
-
-  // Tema oscuro
-  static final ThemeData dark = ThemeData(
+  static ThemeData dark = ThemeData(
+    useMaterial3: true,
+    fontFamily: 'Poppins',
     brightness: Brightness.dark,
-    primaryColor: primary,
-    fontFamily: fontFamily,
-    scaffoldBackgroundColor: const Color.fromARGB(255, 38, 38, 38),
-    appBarTheme: const AppBarTheme(
-      backgroundColor: Color.fromARGB(255, 38, 38, 38),
-      iconTheme: IconThemeData(color: Colors.white),
-      titleTextStyle: TextStyle(
-        color: Colors.white,
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
-      ),
-      elevation: 20,
-    ),
-    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      backgroundColor: Color.fromARGB(255, 38, 38, 38),
-      selectedItemColor: primary,
-      unselectedItemColor: Colors.grey,
-    ),
-    textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(foregroundColor: primary),
-    ),
-    floatingActionButtonTheme:
-      const FloatingActionButtonThemeData(backgroundColor: primary),
+    primaryColor: dark1,
+    primaryColorLight: light1,
+    primaryColorDark: dark1,
+    scaffoldBackgroundColor: Colors.black,
+    textTheme: MyTextTheme.dark,
+    appBarTheme: MyAppBarTheme.dark,
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(backgroundColor: Colors.black),
+    cardTheme: CardTheme(color: dark2,),
+    inputDecorationTheme: MyInputTheme.dark,
+    textSelectionTheme: TextSelectionThemeData(cursorColor: light1),
+    iconTheme: IconThemeData(color: Colors.white),
+    buttonTheme: MyButtonTheme.dark,
+    elevatedButtonTheme: MyElevatedButtonTheme.dark,
+    splashColor: dark1,  
   );
 }

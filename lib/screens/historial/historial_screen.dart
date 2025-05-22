@@ -24,14 +24,19 @@ class HistorialScreen extends StatelessWidget {
               itemCount: residencias.length,
               itemBuilder: (context, index) {
                 return Card(
-                  color: const Color.fromARGB(255, 219, 199, 245),
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30)),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
                   child: ListTile(
-                    leading:
-                        const Icon(Icons.adjust, size: 34, color: Colors.green),
+                    leading: const Icon(
+                      Icons.adjust,
+                      size: 34,
+                      color: Colors.green,
+                    ),
                     title: Text(residencias[index]['estado']!),
                     subtitle: Text(residencias[index]['fecha_ingreso/salida']!),
                     trailing: const Icon(Icons.chevron_right),

@@ -1,23 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:residencias/ui/ui.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final localTheme = ThemeData(
-      inputDecorationTheme: InputDecorationTheme(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-        ),
-        filled: true,
-        fillColor: Colors.grey[300],
-      ),
-    );
-    return Theme(
-      data: localTheme,
+    return GestureDetector(
+      onTap: () { FocusScope.of(context).requestFocus(FocusNode()); },
       child: Scaffold(
-        backgroundColor: Colors.white,
         body: Center(
           child: SingleChildScrollView(
             child: Container(
@@ -28,8 +19,7 @@ class LoginScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.3),
-                    spreadRadius: 2,
+                    color: Colors.black38,
                     blurRadius: 10,
                     offset: const Offset(0, 3),
                   ),
@@ -39,54 +29,22 @@ class LoginScreen extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const Text(
-                    'Inicio Sesión',
-                    style: TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.white,
-                    ),
-                  ),
+                  Text('Inicia Sesión', style: Theme.of(context).textTheme.headlineLarge,),
                   const SizedBox(height: 30),
-                  TextField(
-                    decoration: const InputDecoration(
-                      hintText: 'Correo',
-                      prefixIcon:
-                          Icon(Icons.account_circle, color: Colors.grey),
-                      contentPadding:
-                          EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                    ),
+                  CustomTextField(
+                    hintText: 'Correo',
+                    prefixIcon: Icons.account_circle,
                     keyboardType: TextInputType.emailAddress,
                   ),
                   const SizedBox(height: 20),
-                  TextField(
+                  CustomTextField(
+                    hintText: 'Contraseña',
+                    prefixIcon: Icons.lock,
                     obscureText: true,
-                    decoration: const InputDecoration(
-                      hintText: 'Contraseña',
-                      prefixIcon: Icon(Icons.lock, color: Colors.grey),
-                      contentPadding:
-                          EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                    ),
                   ),
-                  const SizedBox(height: 5),
-                  Row(
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          // Forgot password action
-                        },
-                        child: const Text(
-                          '¿Olvidó su contraseña?',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
+                  //const SizedBox(height: 5),
+                  //Align(alignment:Alignment.centerRight,child:TextButton(onPressed:(){},child:Text('¿Olvidó su contraseña?',style:Theme.of(context).textTheme.labelSmall),),),//no puede ser una funcionalidad
+                  const SizedBox(height: 30),
                   SizedBox(
                     height: 60,
                     width: double.infinity,
@@ -94,20 +52,9 @@ class LoginScreen extends StatelessWidget {
                       onPressed: () {
                         Navigator.pushNamed(context, 'home');
                       },
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        backgroundColor: Colors.grey[300],
-                      ),
+                      style: Theme.of(context).elevatedButtonTheme.style,
                       child: Center(
-                        child: const Text(
-                          'Iniciar Sesión',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
+                        child: Text('Iniciar Sesión', style: Theme.of(context).textTheme.labelMedium),
                       ),
                     ),
                   ),

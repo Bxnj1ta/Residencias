@@ -22,9 +22,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         top: tramoSuperior,
         left: 12, right: 12,
       ),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

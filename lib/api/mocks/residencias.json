@@ -43,5 +43,14 @@
         "address": "Carlos Antúnez 2390",
         "latitude": -33.42530582913204, 
         "length": -70.6046937960841
+    },
+    {
+        "name": "Residencia 6",
+        "image": "https://imgur.com/OdPJTJC",
+        "city": "Santiago",
+        "commune": "Providencia",
+        "address": "Los Navegantes 1992",
+        "latitude": -33.417730685574085,  
+        "length": -70.6167786674936
     }
 ]

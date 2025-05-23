@@ -1,14 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:residencias/api/mocks/mock2.dart';
 import 'package:residencias/ui/ui.dart';
 import 'package:residencias/widgets/widgets.dart';
-import 'package:residencias/mocks/mock2.dart';
 
-class DailyScreen extends StatelessWidget {
+class DailyScreen extends StatefulWidget {
   const DailyScreen({super.key});
+
+  @override
+  State<DailyScreen> createState() => _DailyScreenState();
+}
+
+class _DailyScreenState extends State<DailyScreen> {
+  List<Map<String,dynamic>> residenciasUsuario = [];
 
   @override
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> r = mock2;
+    if (residenciasUsuario.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
     return Scaffold(
       appBar: const CustomAppBar(titulo: 'Residencias del Día'),

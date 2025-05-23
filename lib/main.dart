@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'routes/app_routes.dart';
@@ -23,15 +24,27 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Residencias',
-      debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.initialRoute,
-      routes: AppRoutes.routes,
-      onGenerateRoute: AppRoutes.onGenerateRoute,
-      theme: MyTheme.light,
-      darkTheme: MyTheme.dark,
-      themeMode: ThemeMode.system,
+    return Builder(
+      builder: (context) {
+        final brightness = MediaQuery.of(context).platformBrightness;
+        SystemChrome.setSystemUIOverlayStyle(
+          SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+            statusBarBrightness: brightness == Brightness.dark ? Brightness.dark : Brightness.light,
+          ),
+        );
+        return MaterialApp(
+          title: 'Residencias',
+          debugShowCheckedModeBanner: false,
+          initialRoute: AppRoutes.initialRoute,
+          routes: AppRoutes.routes,
+          onGenerateRoute: AppRoutes.onGenerateRoute,
+          theme: MyTheme.light,
+          darkTheme: MyTheme.dark,
+          themeMode: ThemeMode.system,
+        );
+      }
     );
   }
 }

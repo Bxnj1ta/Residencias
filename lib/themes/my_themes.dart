@@ -29,6 +29,7 @@ class MyTheme {
     buttonTheme: MyButtonTheme.light,
     elevatedButtonTheme: MyElevatedButtonTheme.light,
     splashColor: light1,
+    floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: light2, foregroundColor: dark3),
   );
   static ThemeData dark = ThemeData(
     useMaterial3: true,
@@ -47,6 +48,7 @@ class MyTheme {
     iconTheme: IconThemeData(color: Colors.white),
     buttonTheme: MyButtonTheme.dark,
     elevatedButtonTheme: MyElevatedButtonTheme.dark,
-    splashColor: dark1,  
+    splashColor: dark1,
+    floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: dark2, foregroundColor: light3),  
   );
 }

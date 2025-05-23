@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart' as gl;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mp;
-import 'package:residencias/mocks/mock_residencias.dart';
+import 'package:residencias/api/services/api_service.dart';
+
 
 class MapaResidencias extends StatefulWidget {
   const MapaResidencias({super.key});
@@ -18,11 +19,13 @@ class _MapaResidenciasState extends State<MapaResidencias> {
   gl.Position? _position;
   StreamSubscription<gl.Position>? userPositionStream;
   mp.PointAnnotationManager? _pointAnnotationManager;
+  final ApiService api = ApiService();
+  bool _todoListo = false;
 
   @override
   void initState() {
     super.initState();
-    _obtenerResidencias();
+    _obtenerAgendaDia();
     _positionTracking();
   }
   @override
@@ -91,8 +94,17 @@ class _MapaResidenciasState extends State<MapaResidencias> {
     }
   }
   //carga lista de residencias del usuario
-  void _obtenerResidencias() {
-    residenciasUsuario = mockResidencias;
+  void _obtenerAgendaDia() async {
+    try {
+    final agendaHoy = await api.obtenerAgendaDia();
+    residenciasUsuario = agendaHoy.cast<Map<String, dynamic>>();
+    setState(() {
+      _todoListo = true;
+    });
+    debugPrint("agenda obtenida: $residenciasUsuario");
+    } catch (e) {
+      debugPrint("Error al obtener agenda: $e");
+    }
   }
   //activa el puck y controlador
   void _onMapCreated(mp.MapboxMap controller) async {
@@ -103,51 +115,80 @@ class _MapaResidenciasState extends State<MapaResidencias> {
     );
   }
   //muestra los marcadores al cagar el mapa
-  void _onMapLoaded(mp.MapLoadedEventData _) {
-    agregarMarcadores();
+  void _onMapLoaded(mp.MapLoadedEventData _) async {
+    if (_todoListo && residenciasUsuario.isNotEmpty) {
+      await agregarMarcadores();
+    }
   }
   //agregar marcadores a partir de residenciasUsuario
   Future<void> agregarMarcadores() async {
-    return Future.delayed(Duration(milliseconds: 500), () async {
     try {
       await _pointAnnotationManager?.deleteAll();//limpia anotaciones previas
-      _pointAnnotationManager = await mapboxMapController?.annotations.createPointAnnotationManager();
+      _pointAnnotationManager ??= await mapboxMapController?.annotations.createPointAnnotationManager();
       final Uint8List imageData = await cargarIconoMarcador();
 
-      mp.PointAnnotationOptions pointAnnotationOptions = mp.PointAnnotationOptions(
-        image: imageData,
-        iconSize: 0.2,
-        geometry: mp.Point(coordinates: mp.Position(-70.61067676151647, -33.42936938276679)),
-      );
+      for (final residencia in residenciasUsuario) {
+        final lng = residencia['home_data_length'];
+        final lat = residencia['home_data_latitude'];
 
-      await _pointAnnotationManager?.create(pointAnnotationOptions);
+        if (lng != null && lat != null) {
+          mp.PointAnnotationOptions options = mp.PointAnnotationOptions(
+            geometry: mp.Point(coordinates: mp.Position(lng, lat)),
+            iconSize: 0.2,
+            image: imageData,
+          );
+          await _pointAnnotationManager?.create(options);
+        }
+      }
     } catch (e) {
       debugPrint("Error al cargar marcador: $e");
     }
-  });
   }
   //carga iconos que se usarán
   Future<Uint8List> cargarIconoMarcador() async {
     var byteData = await rootBundle.load("lib/assets/icons/marker.png");
     return byteData.buffer.asUint8List();
   }
-
   @override
   Widget build(BuildContext context) {
-    if (_position == null) {
+    if (!_todoListo || _position == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return mp.MapWidget(
-      onMapCreated: _onMapCreated,
-      onMapLoadedListener: _onMapLoaded,
-      styleUri: mp.MapboxStyles.LIGHT,
-      cameraOptions: mp.CameraOptions(
-        center: mp.Point(
-          coordinates: mp.Position(_position!.longitude, _position!.latitude),
+    return Stack(
+      children: [
+        mp.MapWidget(
+          onMapCreated: _onMapCreated,
+          onMapLoadedListener: _onMapLoaded,
+          styleUri: mp.MapboxStyles.LIGHT,
+          cameraOptions: mp.CameraOptions(
+            center: mp.Point(
+              coordinates: mp.Position(_position!.longitude, _position!.latitude),
+            ),
+            zoom: 14,
+          ),
         ),
-        zoom: 14,
-      ),
+        Positioned(
+          bottom: 16,
+          right: 16,
+          child: FloatingActionButton(
+            child: Icon(Icons.my_location),
+            onPressed: () async {
+              if (_position != null && mapboxMapController != null) {
+                mapboxMapController?.flyTo(
+                  mp.CameraOptions(
+                    center: mp.Point(
+                      coordinates: mp.Position(_position!.longitude, _position!.latitude),
+                    ),
+                    zoom: 14,
+                  ),
+                  mp.MapAnimationOptions(duration: 1000),
+                );
+              }
+            },
+          ),
+        ),
+      ],
     );
   }
 }

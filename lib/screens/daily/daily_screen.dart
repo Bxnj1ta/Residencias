@@ -30,7 +30,6 @@ class DailyScreen extends StatelessWidget {
           ),
         ],
       ),
-      //bottomNavigationBar: const BotonAbajoScreen(),
     );
   }
 }

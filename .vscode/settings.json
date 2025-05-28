@@ -5,5 +5,6 @@
             "group": "Default"
         }
     ],
-    "favorites.sortOrder": "ASC"
+    "favorites.sortOrder": "ASC",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

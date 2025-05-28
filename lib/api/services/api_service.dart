@@ -20,7 +20,7 @@ class ApiService {
       },
       body: jsonEncode(residencia.toJson()),
     );
-    return res.statusCode == 201; //Residencia creada correctamente
+    return res.statusCode == 201; //Residencia creada correctamente (Endpoint POST /home_create/)
   }
 
   Future<bool> generarAgenda() async {
@@ -31,7 +31,7 @@ class ApiService {
         'authorization': basicAuth,
       },
     );
-    return res.statusCode == 200; //Operación exitosa
+    return res.statusCode == 200; //Operación exitosa (Endpoint GET /schedule_generation/)
   }
 
   Future<List<dynamic>> obtenerAgendaDia() async {
@@ -46,7 +46,7 @@ class ApiService {
       final data = jsonDecode(res.body);
       return data['list_current'];
     } else {
-      return [];//falta errores
+      return [];//falta errores (Endpoint GET /schedule_list_current/)
     }
   }
 
@@ -60,6 +60,6 @@ class ApiService {
       },
       body: jsonEncode(estado.toJson()),
     );
-    return res.statusCode == 200;
+    return res.statusCode == 200; //Enpoint POST /schedule_change_state/
   }
 }

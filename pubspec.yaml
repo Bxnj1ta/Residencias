@@ -67,6 +67,7 @@ flutter:
   assets:
     - lib/assets/map/
     - lib/assets/icons/marker.png
+    - lib/assets/image/imagen_login.jpg
     - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -6,6 +6,8 @@ class CustomTextField extends StatelessWidget {
   final EdgeInsets contentPadding;
   final bool obscureText;
   final TextInputType? keyboardType;
+  final TextEditingController? textController;
+
 
   const CustomTextField({
     super.key,
@@ -13,12 +15,14 @@ class CustomTextField extends StatelessWidget {
     this.prefixIcon,
     this.contentPadding = const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
     this.obscureText = false,
-    this.keyboardType
+    this.keyboardType, 
+    this.textController
   });
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: textController,
       obscureText: obscureText,
       decoration: InputDecoration(
         focusColor: Theme.of(context).inputDecorationTheme.focusColor,

@@ -77,7 +77,7 @@ class PerfilScreen extends StatelessWidget {
                       icon: Icons.logout,
                       title: 'Cerrar sesión',
                       onTap: () {
-                        Navigator.pushNamed(context, 'home');
+                        Navigator.pushNamed(context, 'login');
                       }),
                 ],
               ),

@@ -62,4 +62,42 @@ class ApiService {
     );
     return res.statusCode == 200; //Enpoint POST /schedule_change_state/
   }
-}
+
+  // Simulación de autenticacion ya que no hay endpoint
+  Future<Map<String, dynamic>> fakeLogin(String email, String password) async {
+    // Simular que solo ciertos correos/contraseñas son válidos
+    if (email == 'admin@residencias.com' && password == '123456') {
+      return {'success': true};
+    } else {
+      return {'success': false, 'error': 'Correo o contraseña inválidos'};
+    }
+  }
+
+  /*
+  // Cuando haya endpoint para validar las credenciales
+  Future<Map<String, dynamic>> login(String email, String password) async {
+    final url = Uri.parse('$baseUrl/login/'); 
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'email': email,
+        'password': password,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      // Aquí se puede guardar el token si se devuelve:
+      // EnvConfig.token = data['token'];
+      return {'success': true, 'data': data};
+    } else if (response.statusCode == 401) {
+      return {'success': false, 'error': 'Credenciales inválidas'};
+    } else {
+      return {'success': false, 'error': 'Error inesperado: ${response.statusCode}'};
+    }
+  }
+  */
+} 

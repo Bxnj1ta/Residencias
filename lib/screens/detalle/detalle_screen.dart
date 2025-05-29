@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:residencias/ui/detalle_card.dart';
+import 'package:residencias/widgets/residencias/detalle_card.dart';
 import 'package:residencias/widgets/widgets.dart';
 
 class DetalleScreen extends StatefulWidget {

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:residencias/providers/agenda_provider.dart';
 import 'routes/app_routes.dart';
 import 'package:residencias/themes/my_themes.dart';
 
@@ -16,7 +18,20 @@ Future<void> setup() async {
 }
 void main() async {
   await setup();
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) {
+            final provider = AgendaProvider();
+            provider.cargarAgenda();
+            return provider;
+          },
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -26,6 +41,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Builder(
       builder: (context) {
+        //para cambiar la statusbar entre light/dark. no se donde poner esto.
         final brightness = MediaQuery.of(context).platformBrightness;
         SystemChrome.setSystemUIOverlayStyle(
           SystemUiOverlayStyle(

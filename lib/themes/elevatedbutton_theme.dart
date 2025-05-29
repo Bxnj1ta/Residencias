@@ -8,7 +8,8 @@ class MyElevatedButtonTheme {
     style: ButtonStyle(
       splashFactory: NoSplash.splashFactory,
       overlayColor: WidgetStateProperty.all(Colors.white24),
-      backgroundColor: WidgetStateProperty.all(MyTheme.light3),
+      backgroundColor: WidgetStateProperty.all(MyTheme.light2),
+      foregroundColor: WidgetStateProperty.all(MyTheme.dark1),
       shape: WidgetStateProperty.all(RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(30)
       ))
@@ -18,7 +19,8 @@ class MyElevatedButtonTheme {
     style: ButtonStyle(
       splashFactory: NoSplash.splashFactory,
       overlayColor: WidgetStateProperty.all(Colors.black38),
-      backgroundColor: WidgetStateProperty.all(MyTheme.dark3),
+      backgroundColor: WidgetStateProperty.all(MyTheme.dark2),
+      foregroundColor: WidgetStateProperty.all(MyTheme.light1),
       shape: WidgetStateProperty.all(RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(30)
       ))

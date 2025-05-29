@@ -5,6 +5,7 @@ class ResidenciaCard extends StatelessWidget {
   final String nombreResidencia;
   final String direccionResidencia;
   final VoidCallback onTap;
+  final Color colorEstado;
 
   const ResidenciaCard({
     super.key,
@@ -12,6 +13,7 @@ class ResidenciaCard extends StatelessWidget {
     required this.nombreResidencia, // = residencias[index]['home_data_name']
     required this.direccionResidencia, // = residencias[index]['home_data_address']
     required this.onTap,//=Navigator.pushNamed(context,'detalle',arguments:residencias[index],);
+    required this.colorEstado,
   });
 
   @override
@@ -23,12 +25,12 @@ class ResidenciaCard extends StatelessWidget {
         borderRadius = borderRadius > 50 ? 50 : borderRadius;
 
         return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),
           ),
+          clipBehavior: Clip.antiAlias,
           child: ListTile(
-            leading: const Icon(Icons.adjust,size: 34, color: Colors.yellow, ),
+            leading: Icon(Icons.adjust,size: 34, color: colorEstado),
             title: Text(nombreResidencia.toString()),
             subtitle: Text(direccionResidencia.toString()),
             trailing: const Icon(Icons.chevron_right),

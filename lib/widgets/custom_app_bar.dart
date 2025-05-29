@@ -22,6 +22,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         top: tramoSuperior,
         left: 12, right: 12,
       ),
+      decoration: BoxDecoration(
+        color: Theme.of(context).appBarTheme.backgroundColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black38,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

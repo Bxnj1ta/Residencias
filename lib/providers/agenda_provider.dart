@@ -23,4 +23,16 @@ class AgendaProvider extends ChangeNotifier {
     cargando = false;
     notifyListeners();
   }
+
+  bool hayResidenciaEnProceso() {
+    return residenciasUsuario.any((r) => r['home_clean_register_state'] == 'Proceso');
+  }
+
+  int? idResidenciaEnProceso() {
+    final r = residenciasUsuario.firstWhere(
+      (r) => r['home_clean_register_state'] == 'Proceso',
+      orElse: () => {},
+    );
+    return r.isNotEmpty ? r['home_clean_register_id'] as int : null;
+  }
 }

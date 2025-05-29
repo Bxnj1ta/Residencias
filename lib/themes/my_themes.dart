@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:residencias/themes/outlinedbutton_theme.dart';
 import 'package:residencias/themes/themes.dart';
 
 class MyTheme {
@@ -12,16 +13,15 @@ class MyTheme {
     static final Color dark3 = primary.shade600;
 
   static ThemeData light = ThemeData(
+    progressIndicatorTheme: ProgressIndicatorThemeData(color: dark1),
     useMaterial3: true,
     fontFamily: 'Poppins',
     brightness: Brightness.light,
     primaryColor: light1,
-    primaryColorLight: light1,
-    primaryColorDark: dark1,
     scaffoldBackgroundColor: Colors.white,
     textTheme: MyTextTheme.light,
     appBarTheme: MyAppBarTheme.light,
-    bottomNavigationBarTheme: BottomNavigationBarThemeData(backgroundColor: Colors.white),
+    bottomNavigationBarTheme: MyBottomNavBarTheme.light,
     cardTheme: CardTheme(color: light2,),
     inputDecorationTheme: MyInputTheme.light,
     textSelectionTheme: TextSelectionThemeData(cursorColor: dark1),
@@ -29,19 +29,19 @@ class MyTheme {
     buttonTheme: MyButtonTheme.light,
     elevatedButtonTheme: MyElevatedButtonTheme.light,
     splashColor: light1,
-    floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: light2, foregroundColor: dark3),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: light1, foregroundColor: dark1),
+    outlinedButtonTheme: MyOutlinedButtonTheme.light,
   );
   static ThemeData dark = ThemeData(
+    progressIndicatorTheme: ProgressIndicatorThemeData(color: light1),
     useMaterial3: true,
     fontFamily: 'Poppins',
     brightness: Brightness.dark,
     primaryColor: dark1,
-    primaryColorLight: light1,
-    primaryColorDark: dark1,
     scaffoldBackgroundColor: Colors.black,
     textTheme: MyTextTheme.dark,
     appBarTheme: MyAppBarTheme.dark,
-    bottomNavigationBarTheme: BottomNavigationBarThemeData(backgroundColor: Colors.black),
+    bottomNavigationBarTheme: MyBottomNavBarTheme.dark,
     cardTheme: CardTheme(color: dark2,),
     inputDecorationTheme: MyInputTheme.dark,
     textSelectionTheme: TextSelectionThemeData(cursorColor: light1),
@@ -49,6 +49,7 @@ class MyTheme {
     buttonTheme: MyButtonTheme.dark,
     elevatedButtonTheme: MyElevatedButtonTheme.dark,
     splashColor: dark1,
-    floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: dark2, foregroundColor: light3),  
+    floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: dark2, foregroundColor: light1),
+    outlinedButtonTheme: MyOutlinedButtonTheme.dark,
   );
 }

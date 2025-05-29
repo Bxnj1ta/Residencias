@@ -1,18 +1,29 @@
-enum EstadoTipo {proceso,finalizado}
+// To parse this JSON data, do
+//
+//     final estado = estadoFromJson(jsonString);
+
+import 'dart:convert';
+
+Estado estadoFromJson(String str) => Estado.fromJson(json.decode(str));
+
+String estadoToJson(Estado data) => json.encode(data.toJson());
 
 class Estado {
-  final int id;
-  final EstadoTipo nuevoEstado;
-  
+    final int homeScheduleId;
+    final String homeScheduleState;
 
-  Estado({
-    required this.id,
-    required this.nuevoEstado,
-    
-  });
+    Estado({
+        required this.homeScheduleId,
+        required this.homeScheduleState,
+    });
 
-  Map<String, dynamic> toJson() => {
-    'home_schedule_id': id,
-    'home_schedule_state': nuevoEstado.toString().split('.').last,
-  };
+    factory Estado.fromJson(Map<String, dynamic> json) => Estado(
+        homeScheduleId: json["home_schedule_id"],
+        homeScheduleState: json["home_schedule_state"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "home_schedule_id": homeScheduleId,
+        "home_schedule_state": homeScheduleState,
+    };
 }

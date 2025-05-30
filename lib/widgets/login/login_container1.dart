@@ -69,14 +69,12 @@ class _LoginContainer1State extends State<LoginContainer1> {
               ),
               const SizedBox(height: 30),
               CustomTextField(
-                textController: emailController,
                 hintText: 'Correo electrónico',
                 prefixIcon: Icons.email_rounded,
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 20),
               CustomTextField(
-                textController: passwordController,
                 hintText: 'Contraseña',
                 prefixIcon: Icons.lock_outline,
                 obscureText: true,

@@ -12,10 +12,10 @@ class MyTheme {
     static final Color dark2 = primary.shade800;
     static final Color dark3 = primary.shade600;
 
-    static final Color blue_marker = Color.fromARGB(255, 63, 167, 214);    //Pendiente
-    static final Color yellow_marker = Color.fromARGB(255, 250, 192, 94);  //Proceso
-    static final Color green_marker = Color.fromARGB(255, 89, 205, 144);   //Finalizado
-    static final Color red_marker = Color.fromARGB(255, 238, 99, 82);     //Cancelado (No definido)
+    static final Color blueMarker = Color.fromARGB(255, 63, 167, 214);    //Pendiente
+    static final Color yellowMarker = Color.fromARGB(255, 250, 192, 94);  //Proceso
+    static final Color greenMarker = Color.fromARGB(255, 89, 205, 144);   //Finalizado
+    static final Color redMarker = Color.fromARGB(255, 238, 99, 82);     //Cancelado (No definido)
 
   static ThemeData light = ThemeData(
     progressIndicatorTheme: ProgressIndicatorThemeData(color: dark1),

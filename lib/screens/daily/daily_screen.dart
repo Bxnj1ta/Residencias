@@ -51,7 +51,7 @@ class DailyScreen extends StatelessWidget {
                 if (enProceso.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   ResidenciaCard(
-                    colorEstado: MyTheme.yellow_marker,
+                    colorEstado: MyTheme.yellowMarker,
                     nombreResidencia: enProceso['home_data_name'].toString(),
                     direccionResidencia: enProceso['home_data_address'].toString(),
                     onTap: () {
@@ -69,7 +69,7 @@ class DailyScreen extends StatelessWidget {
                         children: [
                           if (enProceso.isEmpty) const SizedBox(height: 12),
                           ResidenciaCard(
-                            colorEstado: MyTheme.blue_marker,
+                            colorEstado: MyTheme.blueMarker,
                             nombreResidencia: pendientes[index]['home_data_name'] .toString(),
                             direccionResidencia: pendientes[index]['home_data_address'] .toString(),
                             onTap: () {

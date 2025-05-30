@@ -53,7 +53,7 @@ class HistorialScreen extends StatelessWidget {
                         children: [
                           const SizedBox(height: 12,), // Espacio antes del primer elemento
                           ResidenciaCard(
-                            colorEstado: MyTheme.green_marker,
+                            colorEstado: MyTheme.greenMarker,
                             nombreResidencia: rPendientes[index]['home_data_name'] .toString(),
                             direccionResidencia: rPendientes[index]['home_data_address'] .toString(),
                             onTap: () {

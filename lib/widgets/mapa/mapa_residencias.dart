@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart' as gl;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mp;
 import 'package:provider/provider.dart';
 import 'package:residencias/providers/agenda_provider.dart';
+import 'package:residencias/widgets/mapa/residencia_annotation_click_listener.dart';
 
 class MapaResidencias extends StatefulWidget {
   const MapaResidencias({super.key});
@@ -19,13 +20,25 @@ class _MapaResidenciasState extends State<MapaResidencias> {
   StreamSubscription<gl.Position>? userPositionStream;
   mp.PointAnnotationManager? _pointAnnotationManager;
   Brightness? _tema;
-  Uint8List? _markerIcon;
+  Uint8List? _markerIconPendiente;
+  Uint8List? _markerIconProceso;
+  Uint8List? _markerIconFinalizado;
   bool _mapLoaded = false;
+
+  // Mapa para asociar el id de residencia a su información
+  final Map<String, Map<String, dynamic>> _residenciaPorId = {};
 
   @override
   void initState() {
     super.initState();
     _initLocation();
+  }
+
+  void _mostrarSnackBar(String mensaje) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(mensaje)),
+    );
   }
 
   Future<void> _initLocation() async {
@@ -56,24 +69,14 @@ class _MapaResidenciasState extends State<MapaResidencias> {
           }
         });
       }
-      // El stream de ubicación solo debe suscribirse en _onMapLoaded, no en _initLocation
-      // Por lo tanto, elimina esta sección de _initLocation:
-      // userPositionStream?.cancel();
-      // userPositionStream = gl.Geolocator
-      //     .getPositionStream(locationSettings: const gl.LocationSettings(
-      //       accuracy: gl.LocationAccuracy.high,
-      //       distanceFilter: 100,
-      //     ))
-      //     .listen(_actualizarUbicacion);
     } catch (e) {
-      debugPrint("Error en rastreo de posición: $e");
+      _mostrarSnackBar("Error en rastreo de posición.");
     }
   }
-
   @override
   void dispose() {
     userPositionStream?.cancel();
-    _pointAnnotationManager?.deleteAll();
+    // No llamar a _pointAnnotationManager?.deleteAll() aquí para evitar crash
     super.dispose();
   }
 
@@ -95,20 +98,25 @@ class _MapaResidenciasState extends State<MapaResidencias> {
   }
 
   Future<void> _actualizarUbicacion(gl.Position position) async {
-    if (mapboxMapController == null || !_mapLoaded) return;
-    final cameraState = await mapboxMapController!.getCameraState();
-    final cameraOptions = cameraState.toCameraOptions();
-    final bounds = await mapboxMapController!.coordinateBoundsForCamera(cameraOptions);
-    final pos = mp.Position(position.longitude, position.latitude);
-    final inViewport = pos.lng >= bounds.southwest.coordinates.lng &&
-        pos.lng <= bounds.northeast.coordinates.lng &&
-        pos.lat >= bounds.southwest.coordinates.lat &&
-        pos.lat <= bounds.northeast.coordinates.lat;
-    if (!inViewport) {
-      mapboxMapController?.flyTo(
-        mp.CameraOptions(center: mp.Point(coordinates: pos), zoom: 14),
-        mp.MapAnimationOptions(duration: 1000),
-      );
+    if (!mounted || mapboxMapController == null || !_mapLoaded) return;
+    try {
+      final cameraState = await mapboxMapController!.getCameraState();
+      if (!mounted) return;
+      final cameraOptions = cameraState.toCameraOptions();
+      final bounds = await mapboxMapController!.coordinateBoundsForCamera(cameraOptions);
+      final pos = mp.Position(position.longitude, position.latitude);
+      final inViewport = pos.lng >= bounds.southwest.coordinates.lng &&
+          pos.lng <= bounds.northeast.coordinates.lng &&
+          pos.lat >= bounds.southwest.coordinates.lat &&
+          pos.lat <= bounds.northeast.coordinates.lat;
+      if (!inViewport) {
+        mapboxMapController?.flyTo(
+          mp.CameraOptions(center: mp.Point(coordinates: pos), zoom: 14),
+          mp.MapAnimationOptions(duration: 1000),
+        );
+      }
+    } catch (e) {
+      //agregar un print
     }
   }
 
@@ -138,31 +146,73 @@ class _MapaResidenciasState extends State<MapaResidencias> {
 
   Future<void> _agregarMarcadores(List<Map<String, dynamic>> residenciasUsuario) async {
     try {
-      await _pointAnnotationManager?.deleteAll();
-      _pointAnnotationManager ??= await mapboxMapController?.annotations.createPointAnnotationManager();
-      _markerIcon ??= await cargarIconoMarcador();
-      //lista de residencas -> limpia LatLng -> mapea anotaciones -> lo pasa a una lista de anotaciones
+      // Siempre crea un nuevo manager y reemplaza el anterior
+      _pointAnnotationManager = await mapboxMapController?.annotations.createPointAnnotationManager();
+      // Limpiar el mapa antes de agregar nuevos
+      _residenciaPorId.clear();
+      // Cargar íconos de marcadores por estado si no están cargados
+      _markerIconPendiente ??= await cargarIconoMarcador('pendiente');
+      _markerIconProceso ??= await cargarIconoMarcador('proceso');
+      _markerIconFinalizado ??= await cargarIconoMarcador('finalizado');
       final optionsList = residenciasUsuario
           .where((r) => r['home_data_length'] != null && r['home_data_latitude'] != null)
-          .map((r) => mp.PointAnnotationOptions(
-                geometry: mp.Point(coordinates: mp.Position(r['home_data_length'], r['home_data_latitude'])),
-                iconSize: 0.2,
-                image: _markerIcon!,
-              ))
+          .map((r) {
+            String estado = (r['home_clean_register_state'] ?? '').toString().toLowerCase();
+            Uint8List? icono;
+            if (estado == 'pendiente') {
+              icono = _markerIconPendiente;
+            } else if (estado == 'proceso') {
+              icono = _markerIconProceso;
+            } else if (estado == 'finalizado') {
+              icono = _markerIconFinalizado;
+            } else {
+              icono = _markerIconPendiente; // fallback
+            }
+            final id = r['home_clean_register_id']?.toString() ?? '';
+            if (id.isNotEmpty) {
+              _residenciaPorId[id] = r;
+            }
+            // Usar textField para guardar el id
+            return mp.PointAnnotationOptions(
+              geometry: mp.Point(coordinates: mp.Position(r['home_data_length'], r['home_data_latitude'])),
+              iconSize: 0.5,
+              image: icono!,
+              textField: id, //la unica forma de referencia el marcador
+              textColor: 0x00000000, //trasparente
+              textHaloColor: 0x00000000, //trasparente
+              textSize: 1, //que no se note
+            );
+          })
           .toList();
       if (optionsList.isNotEmpty) {
         await _pointAnnotationManager?.createMulti(optionsList);
+        if (!mounted) return;
+        _pointAnnotationManager?.addOnPointAnnotationClickListener(ResidenciaPushListener(context, _residenciaPorId));
       }
     } catch (e) {
-      debugPrint("Error al cargar marcador: $e");
+      _mostrarSnackBar("Error al cargar marcadores.");
     }
   }
 
-  Future<Uint8List> cargarIconoMarcador() async {
-    final byteData = await rootBundle.load("lib/assets/icons/marker.png");
-    return byteData.buffer.asUint8List();
+  Future<Uint8List> cargarIconoMarcador(String estado) async {
+    try {
+      String path = "lib/assets/icons/";
+      if (estado == 'pendiente') {
+        path += "blue_marker.png";
+      } else if (estado == 'proceso') {
+        path += "yellow_marker.png";
+      } else if (estado == 'finalizado') {
+        path += "green_marker.png";
+      } else {
+        path += "red_marker.png";
+      }
+      final byteData = await rootBundle.load(path);
+      return byteData.buffer.asUint8List();
+    } catch (e) {
+      _mostrarSnackBar('Error al cargar el icono del marcador "$estado".');
+      rethrow;
+    }
   }
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -238,3 +288,4 @@ class _MapaResidenciasState extends State<MapaResidencias> {
     );
   }
 }
+

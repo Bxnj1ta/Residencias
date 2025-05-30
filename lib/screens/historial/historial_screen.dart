@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:residencias/providers/agenda_provider.dart';
+import 'package:residencias/themes/my_themes.dart';
 import 'package:residencias/ui/ui.dart';
 import 'package:residencias/widgets/widgets.dart';
 
@@ -52,7 +53,7 @@ class HistorialScreen extends StatelessWidget {
                         children: [
                           const SizedBox(height: 12,), // Espacio antes del primer elemento
                           ResidenciaCard(
-                            colorEstado: Colors.blue,
+                            colorEstado: MyTheme.green_marker,
                             nombreResidencia: rPendientes[index]['home_data_name'] .toString(),
                             direccionResidencia: rPendientes[index]['home_data_address'] .toString(),
                             onTap: () {

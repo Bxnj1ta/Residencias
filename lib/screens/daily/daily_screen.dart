@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:residencias/providers/agenda_provider.dart';
+import 'package:residencias/themes/my_themes.dart';
 import 'package:residencias/ui/ui.dart';
 import 'package:residencias/widgets/widgets.dart';
 
@@ -50,13 +51,14 @@ class DailyScreen extends StatelessWidget {
                 if (enProceso.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   ResidenciaCard(
-                    colorEstado: Colors.yellow,
+                    colorEstado: MyTheme.yellow_marker,
                     nombreResidencia: enProceso['home_data_name'].toString(),
                     direccionResidencia: enProceso['home_data_address'].toString(),
                     onTap: () {
                       Navigator.pushNamed( context, 'detalle', arguments: enProceso, );
                     },
                   ),
+                  const SizedBox(height: 12),
                 ],
                 Expanded(
                   child: ListView.builder(
@@ -65,15 +67,16 @@ class DailyScreen extends StatelessWidget {
                     itemBuilder: (context, index) {
                       return Column(
                         children: [
-                          const SizedBox(height: 12), // Espacio antes del primer elemento
+                          if (enProceso.isEmpty) const SizedBox(height: 12),
                           ResidenciaCard(
-                            colorEstado: Colors.green,
+                            colorEstado: MyTheme.blue_marker,
                             nombreResidencia: pendientes[index]['home_data_name'] .toString(),
                             direccionResidencia: pendientes[index]['home_data_address'] .toString(),
                             onTap: () {
                               Navigator.pushNamed( context, 'detalle', arguments: pendientes[index], );
                             },
                           ),
+                          if (enProceso.isNotEmpty) const SizedBox(height: 12), // Espacio antes del primer elemento
                         ],
                       );
                     },

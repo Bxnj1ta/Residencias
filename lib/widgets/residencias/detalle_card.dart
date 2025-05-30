@@ -22,7 +22,7 @@ class _DetalleCardState extends State<DetalleCard> {
   Position? posicion;
   double? distanciaMetros;
 
-  static const double _rangoPermitido = 10;
+  static const double _rangoPermitido = 30;
   static const String _msgErrorDistancia = 'No se pudo calcular la distancia.';
   static const String _msgFueraRango = 'Debes estar más cerca de la residencia.';
 

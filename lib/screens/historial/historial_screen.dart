@@ -12,6 +12,10 @@ class HistorialScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AgendaProvider>(
       builder: (context, agenda, _) {
+        final rPendientes = agenda.residenciasUsuario
+        .where((r) => r['home_clean_register_state'] == 'Finalizado')
+        .toList();
+
         if (agenda.cargando) {
           return Center(child: CircularProgressIndicator());
         }
@@ -22,21 +26,18 @@ class HistorialScreen extends StatelessWidget {
             onRetry: () => agenda.cargarAgenda(),
           );
         }
-        if (agenda.residenciasUsuario.isEmpty) {
+        if (rPendientes.isEmpty) {
           return Scaffold(
             appBar: const CustomAppBar(titulo: 'Residencias del Día'),
             body: Center(
               child: Text(
-                'No hay residencias asignadas para hoy.',
+                'No hay residencias realizadas en los últimos 30 días.',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
           );
         }
 
-        final rPendientes = agenda.residenciasUsuario
-        .where((r) => r['home_clean_register_state'] == 'Finalizado')
-        .toList();
         
         return Scaffold(
           appBar: const CustomAppBar(titulo: 'Residencias del Día'),

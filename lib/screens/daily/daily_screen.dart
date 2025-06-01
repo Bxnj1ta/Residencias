@@ -55,7 +55,7 @@ class DailyScreen extends StatelessWidget {
                     nombreResidencia: enProceso['home_data_name'].toString(),
                     direccionResidencia: enProceso['home_data_address'].toString(),
                     onTap: () {
-                      Navigator.pushNamed( context, 'detalle', arguments: enProceso, );
+                      Navigator.pushNamed( context, 'detalle', arguments: enProceso);
                     },
                   ),
                   const SizedBox(height: 12),

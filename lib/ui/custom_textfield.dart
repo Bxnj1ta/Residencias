@@ -6,8 +6,8 @@ class CustomTextField extends StatelessWidget {
   final EdgeInsets contentPadding;
   final bool obscureText;
   final TextInputType? keyboardType;
-  final TextEditingController? textController;
-
+  final TextEditingController? controller;
+  final String? Function(String?)? validator;
 
   const CustomTextField({
     super.key,
@@ -15,22 +15,23 @@ class CustomTextField extends StatelessWidget {
     this.prefixIcon,
     this.contentPadding = const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
     this.obscureText = false,
-    this.keyboardType, 
-    this.textController
+    this.keyboardType,
+    this.controller,
+    this.validator,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: textController,
+    return TextFormField(
+      controller: controller,
       obscureText: obscureText,
+      keyboardType: keyboardType,
+      validator: validator,
       decoration: InputDecoration(
-        focusColor: Theme.of(context).inputDecorationTheme.focusColor,
         hintText: hintText,
         prefixIcon: Icon(prefixIcon, color: Theme.of(context).iconTheme.color),
         contentPadding: contentPadding,
       ),
-      keyboardType: keyboardType,
       onTapOutside: (event) {
         FocusManager.instance.primaryFocus?.unfocus();
       },

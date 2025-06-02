@@ -15,7 +15,17 @@ class AgendaProvider extends ChangeNotifier {
     notifyListeners();
     try {
       final agendaHoy = await api.obtenerAgendaDia();
-      residenciasUsuario = agendaHoy.cast<Map<String, dynamic>>();
+      final List<Map<String, dynamic>> residencias = agendaHoy.cast<Map<String, dynamic>>();
+      final Set<String> latLngSet = {};
+      residenciasUsuario = residencias.where((r) {
+        final latLng = '${r['home_data_latitude']}${r['home_data_length']}';
+        if (latLngSet.contains(latLng)) {
+          return false;
+        } else {
+          latLngSet.add(latLng);
+          return true;
+        }
+      }).toList();
       debugPrint('Residencias del día: $residenciasUsuario');
     } catch (e) {
       error = e.toString();

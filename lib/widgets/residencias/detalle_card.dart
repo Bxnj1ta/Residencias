@@ -76,6 +76,25 @@ class _DetalleCardState extends State<DetalleCard> {
     );
   }
 
+  void mostrarMapa() async {
+    final lat = widget.residencia['home_data_latitude'];
+    final lng = widget.residencia['home_data_length'];
+    if (lat != null && lng != null) {
+      Navigator.pushNamed(
+        context,
+        'mapa',
+        arguments: {
+          'lat': lat,
+          'lng': lng,
+          'nombre': widget.residencia['home_data_name'],
+          'permitirTapResidencia': false,
+          'seguirUsuario': false,
+          'zoom': 17.0, // Zoom más alto
+        },
+      );
+    }
+  }
+
   void abrirRuta(double lat, double lng) async {
     final url =
         'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng&travelmode=transit';
@@ -194,8 +213,8 @@ class _DetalleCardState extends State<DetalleCard> {
               ],
             ),
             const SizedBox(height: 16),
-            Row( //mapa y direcciones
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            Row( //direcciones y mapa
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [ //despues refactorizar
                 OutlinedButton.icon(
                   onPressed: () {
@@ -208,7 +227,7 @@ class _DetalleCardState extends State<DetalleCard> {
                   style: Theme.of(context).outlinedButtonTheme.style,
                 ),
                 OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: mostrarMapa,
                   icon: Icon(Icons.map, color: Theme.of(context).iconTheme.color),
                   label: const Text("Ver en el mapa"),
                   style: Theme.of(context).outlinedButtonTheme.style,

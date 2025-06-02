@@ -1,15 +1,24 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart' as gl;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mp;
 import 'package:provider/provider.dart';
 import 'package:residencias/providers/agenda_provider.dart';
-import 'package:image/image.dart' as img;
+import 'package:residencias/widgets/mapa/location_service.dart';
+import 'package:residencias/widgets/mapa/map_markers_helper.dart';
 
 class MapaResidencias extends StatefulWidget {
-  const MapaResidencias({super.key});
+  final gl.Position? initialPosition;
+  final bool seguirUsuario;
+  final bool permitirTapResidencia;
+  final double? initialZoom;
+  const MapaResidencias({
+    super.key,
+    this.initialPosition,
+    this.seguirUsuario = true,
+    this.permitirTapResidencia = true,
+    this.initialZoom,
+  });
 
   @override
   State<MapaResidencias> createState() => _MapaResidenciasState();
@@ -22,11 +31,17 @@ class _MapaResidenciasState extends State<MapaResidencias> {
   Brightness? _tema;
   bool _mapLoaded = false;
   late BuildContext _myContext;
+  final LocationService _locationService = LocationService();
 
   @override
   void initState() {
     super.initState();
-    _initLocation();
+    if (widget.initialPosition != null) {
+      _position = widget.initialPosition;
+    }
+    if (widget.seguirUsuario) {
+      _initLocation();
+    }
   }
 
   void _mostrarSnackBar(String mensaje) {
@@ -35,34 +50,37 @@ class _MapaResidenciasState extends State<MapaResidencias> {
       SnackBar(content: Text(mensaje)),
     );
   }
+
   //ubicación inicial
   Future<void> _initLocation() async {
     try {
-      await _checkServicioYPermiso();
-      //para que el mapa cargue mas rapido
-      final last = await gl.Geolocator.getLastKnownPosition();
-      if (last != null) {
-        setState(() => _position = last);
-      }
-      //obtiene la ubicación actual y actualiza si es diferente
-      final current = await gl.Geolocator.getCurrentPosition();
-      if (_position == null ||
-          _position!.latitude != current.latitude ||
-          _position!.longitude != current.longitude) {
-        setState(() {
-          _position = current;
-          if (mapboxMapController != null) {
-            mapboxMapController?.flyTo(
-              mp.CameraOptions(
-                center: mp.Point(
-                  coordinates: mp.Position(_position!.longitude, _position!.latitude),
+      await _locationService.checkServicioYPermiso();
+      if (_position == null) {
+        //para que el mapa cargue mas rapido
+        final last = await _locationService.getLastKnownPosition();
+        if (last != null) {
+          setState(() => _position = last);
+        }
+        //obtiene la ubicación actual y actualiza si es diferente
+        final current = await _locationService.getCurrentPosition();
+        if (_position == null ||
+            _position!.latitude != current.latitude ||
+            _position!.longitude != current.longitude) {
+          setState(() {
+            _position = current;
+            if (mapboxMapController != null) {
+              mapboxMapController?.flyTo(
+                mp.CameraOptions(
+                  center: mp.Point(
+                    coordinates: mp.Position(_position!.longitude, _position!.latitude),
+                  ),
+                  zoom: 14,
                 ),
-                zoom: 14,
-              ),
-              mp.MapAnimationOptions(duration: 1000),
-            );
-          }
-        });
+                mp.MapAnimationOptions(duration: 1000),
+              );
+            }
+          });
+        }
       }
     } catch (e) {
       _mostrarSnackBar("Error en rastreo de posición.");
@@ -72,23 +90,6 @@ class _MapaResidenciasState extends State<MapaResidencias> {
   void dispose() {
     userPositionStream?.cancel();
     super.dispose();
-  }
-  //revisa permisos y servicios de ubicación
-  Future<bool> _checkServicioYPermiso() async {
-    if (!await gl.Geolocator.isLocationServiceEnabled()) {
-      return Future.error('Servicio de ubicación está desactivado.');
-    }
-    var permission = await gl.Geolocator.checkPermission();
-    if (permission == gl.LocationPermission.denied) {
-      permission = await gl.Geolocator.requestPermission();
-      if (permission == gl.LocationPermission.denied) {
-        return Future.error('Permiso de ubicacion denegado.');
-      }
-    }
-    if (permission == gl.LocationPermission.deniedForever) {
-      return Future.error('Permiso de ubicación denegado permanentemente.');
-    }
-    return true;
   }
   //funcion para seguir la ubicacion con la camara
   Future<void> _actualizarUbicacion(gl.Position position) async {
@@ -117,138 +118,77 @@ class _MapaResidenciasState extends State<MapaResidencias> {
   void _onMapCreated(mp.MapboxMap controller) async {
     mapboxMapController = controller;
     mapboxMapController?.location.updateSettings(
-      mp.LocationComponentSettings(enabled: true),
+      mp.LocationComponentSettings(enabled: true), // Sin layerAbove aquí
     );
-    
-    mapboxMapController?.addInteraction(
-      mp.TapInteraction(mp.FeaturesetDescriptor(layerId: "residencias-layer"), 
-      (feature, context) {
-        if (!(feature.properties.containsKey('point_count'))) {
-          final id = feature.properties['id'];
-          // Busca la residencia en el provider
-          final agenda = Provider.of<AgendaProvider>(_myContext, listen: false);
-          final residencia = agenda.residenciasUsuario.firstWhere(
-            (r) => r['home_clean_register_id'].toString() == id.toString(),
-            orElse: () => {},
-          );
-          if (residencia.isNotEmpty) {
-            Navigator.pushNamed(_myContext, 'detalle', arguments: residencia);
+    if (widget.permitirTapResidencia) {
+      mapboxMapController?.addInteraction(
+        mp.TapInteraction(mp.FeaturesetDescriptor(layerId: "residencias-layer"),
+        (feature, context) {
+          if (!(feature.properties.containsKey('point_count'))) {
+            final id = feature.properties['id'];
+            final agenda = Provider.of<AgendaProvider>(_myContext, listen: false);
+            final residencia = agenda.residenciasUsuario.firstWhere(
+              (r) => r['home_clean_register_id'].toString() == id.toString(),
+              orElse: () => {},
+            );
+            if (residencia.isNotEmpty) {
+              Navigator.pushNamed(_myContext, 'detalle', arguments: residencia);
+            }
           }
-        }
-      }),
-      interactionID: "residenciaTapInteraction",
-    );
+        }),
+        interactionID: "residenciaTapInteraction",
+      );
 
+      mapboxMapController?.addInteraction(
+        mp.TapInteraction(mp.FeaturesetDescriptor(layerId: "clusters"), 
+        ( feature, context, ) async {
+          if (feature.properties.containsKey('point_count')) {
+            final coordinates = feature.geometry['coordinates'] as List?;
+            debugPrint("COOR $coordinates");
+            if (coordinates != null && coordinates.length >= 2) {
+              final lng = coordinates[0];
+              final lat = coordinates[1];
+              final cameraState = await mapboxMapController?.getCameraState();
+              final zoomActual = cameraState != null ? cameraState.zoom : 14.0;
+              final nuevoZoom = zoomActual + 3;
+              mapboxMapController?.flyTo(
+                mp.CameraOptions(
+                  center: mp.Point(coordinates: mp.Position(lng, lat)),
+                  zoom: nuevoZoom,
+                ),
+                mp.MapAnimationOptions(duration: 1500),
+              );
+            } else {
+              _mostrarSnackBar("No se pudo obtener la ubicación del cluster.");
+            }
+          }
+        }),
+        interactionID: "clusterTapInteraction",
+      );
+    }
   }
   //Provider->Residencias->geojson. y suscribir al stream con listen.
   void _onMapLoaded(mp.MapLoadedEventData _) async {
     _mapLoaded = true;
     final agenda = Provider.of<AgendaProvider>(context, listen: false);
-    if (_position != null && agenda.residenciasUsuario.isNotEmpty) {
-      await _agregarGeoJsonSource(agenda.residenciasUsuario);
+    if (_position != null && agenda.residenciasUsuario.isNotEmpty && mapboxMapController != null) {
+      await MapMarkersHelper.agregarGeoJsonSource(
+        mapboxMapController: mapboxMapController!,
+        residenciasUsuario: agenda.residenciasUsuario,
+        mostrarSnackBar: _mostrarSnackBar,
+      );
+      // Ahora que las capas existen, actualiza el puck encima de cluster-count
+      mapboxMapController?.location.updateSettings(
+        mp.LocationComponentSettings(enabled: true, layerAbove: "cluster-count"),
+      );
     }
-    //cada 100m, revisar si el puck esta fuera del mapa
-    userPositionStream?.cancel();
-    userPositionStream = gl.Geolocator
-        .getPositionStream(locationSettings: const gl.LocationSettings(
-          accuracy: gl.LocationAccuracy.best,
-          distanceFilter: 100,
-        ))
-        .listen(_actualizarUbicacion);
-  }
-
-  Future<void> _agregarGeoJsonSource(List<Map<String, dynamic>> residenciasUsuario) async {
-    try {
-      //asegurarse que tiene latlng
-      final features = residenciasUsuario
-          .where((r) => r['home_data_length'] != null && r['home_data_latitude'] != null)
-          .map((r) => {
-                "type": "Feature",
-                "geometry": {
-                  "type": "Point",
-                  "coordinates": [r['home_data_length'], r['home_data_latitude']]
-                },
-                "properties": {
-                  "id": r['home_clean_register_id']?.toString() ?? '',
-                  "estado": (r['home_clean_register_state'] ?? '').toString().toLowerCase(),
-                }
-              })
-          .toList();
-      final geojson = {
-        "type": "FeatureCollection",
-        "features": features,
-      };
-      // Cargar el icono azul y añadirlo al estilo del mapa
-      final byteData = await rootBundle.load('lib/assets/icons/blue_marker.png');
-      final markerBytes = byteData.buffer.asUint8List();
-      final decoded = img.decodeImage(markerBytes);
-      if (decoded == null) {
-        _mostrarSnackBar("No se pudo cargar iconos.");
-        return;
-      }
-      final mbxImage = mp.MbxImage(
-        width: decoded.width,
-        height: decoded.height,
-        data: markerBytes,
-      );
-      await mapboxMapController?.style.addStyleImage(
-        "blue_marker",          //image id, lo importante
-        1.0,                    //escala
-        mbxImage,               //imagen
-        false,                  //sdf
-        <mp.ImageStretches>[],  //eje x
-        <mp.ImageStretches?>[], //eje y
-        null                    //contenido
-      );
-      //aqui se crea GeoJSON
-      final source = mp.GeoJsonSource(
-        id: "residencias-source",
-        data: jsonEncode(geojson),
-        cluster: true,
-        clusterRadius: 50, //que tan cerca los marcadores para agruparse
-        clusterMaxZoom: 22, //tolerancia de zoom hasta que rompa el cluster(creo)
-      );
-      await mapboxMapController?.style.addSource(source);
-
-      //layer para clusters (círculo)
-      final clusterCircleLayer = mp.CircleLayer(
-        id: "clusters",
-        sourceId: "residencias-source",
-        filter: ["has", "point_count"],
-        circleColorExpression: [
-          "step", ["get", "point_count"], "#3fa7d6", 10, "#3fa7d6", 30, "#3fa7d6"
-        ],
-        circleRadiusExpression: [
-          "step", ["get", "point_count"], 18, 10, 22, 30, 28
-        ],
-      );
-      await mapboxMapController?.style.addLayer(clusterCircleLayer);
-
-      //layer para el número de residencias en el cluster
-      final clusterCountLayer = mp.SymbolLayer(
-        id: "cluster-count",
-        sourceId: "residencias-source",
-        filter: ["has", "point_count"],
-        textFieldExpression: ["to-string", ["get", "point_count"]],
-        textSize: 14.0,
-        textColorExpression: ["literal", "#ffffff"],
-      );
-      await mapboxMapController?.style.addLayer(clusterCountLayer);
-
-      //layer para los puntos individuales
-      final layer = mp.SymbolLayer(
-        id: "residencias-layer",
-        sourceId: "residencias-source",
-        filter: ["!", ["has", "point_count"]],
-        iconImage: "blue_marker",
-        iconSize: 0.2,
-        iconAllowOverlap: false, //mostrar los iconos individuales
-      );
-      await mapboxMapController?.style.addLayer(layer);
-    } catch (e) {
-      _mostrarSnackBar("Error al cargar marcadores.");
+    if (widget.seguirUsuario) {
+      userPositionStream?.cancel();
+      userPositionStream = _locationService.getPositionStream(distanceFilter: 100)
+          .listen(_actualizarUbicacion);
     }
   }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -285,6 +225,7 @@ class _MapaResidenciasState extends State<MapaResidencias> {
     }
     final brightness = MediaQuery.of(context).platformBrightness;
     final styleUri = brightness == Brightness.dark ? mp.MapboxStyles.DARK : mp.MapboxStyles.LIGHT;
+    final double zoom = widget.initialZoom ?? 14;
         
     return Stack(
       children: [
@@ -296,7 +237,7 @@ class _MapaResidenciasState extends State<MapaResidencias> {
             center: mp.Point(
               coordinates: mp.Position(_position!.longitude, _position!.latitude),
             ),
-            zoom: 14,
+            zoom: zoom,
           ),
         ),
         Positioned(

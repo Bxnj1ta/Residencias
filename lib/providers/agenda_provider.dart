@@ -8,6 +8,10 @@ class AgendaProvider extends ChangeNotifier {
   String? error;
 
   AgendaProvider({ApiService? apiService}) : api = apiService ?? ApiService();
+  
+  void setCredenciales(String usuario, String password) {
+    api.setCredenciales(usuario, password);
+  }
 
   Future<void> cargarAgenda() async {
     cargando = true;

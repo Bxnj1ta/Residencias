@@ -14,18 +14,9 @@ class _LoginContainer1State extends State<LoginContainer1> {
   final TextEditingController passwordController = TextEditingController();
 
   void _login() async {
-    final email = emailController.text.trim();
+    final usuario = emailController.text.trim();
     final password = passwordController.text.trim();
 
-    final result = await ApiService().fakeLogin(email, password);
-
-    if (result['success']) {
-      Navigator.pushReplacementNamed(context, 'home');
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result['error'])),
-      );
-    }
   }
 
   @override

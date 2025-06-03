@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:residencias/ui/ui.dart';
+import 'package:provider/provider.dart';
+import 'package:residencias/providers/agenda_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,20 +14,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _correoController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
-  String? _validarCorreo(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Por favor ingresa tu correo';
-    }
-
-    final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
-
-    if (!emailRegex.hasMatch(value)) {
-      return 'Formato de correo no válido';
-    }
-
-    return null;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +50,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       prefixIcon: Icons.account_circle,
                       keyboardType: TextInputType.emailAddress,
                       controller: _correoController,
-                      validator: _validarCorreo,
                     ),
                     const SizedBox(height: 20),
 
@@ -79,11 +66,34 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 60,
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            Navigator.pushNamed(context, 'home');
+                            final usuario = _correoController.text.trim();
+                            final password = _passwordController.text.trim();
+
+                            final agendaProvider = Provider.of<AgendaProvider>(context, listen: false);
+                            agendaProvider.setCredenciales(usuario, password);
+
+                            // Mostrar loading mientras se carga la agenda
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => const Center(child: CircularProgressIndicator()),
+                            );
+
+                            try {
+                              await agendaProvider.cargarAgenda();
+                              Navigator.pop(context); // Quitar loading
+                              Navigator.pushReplacementNamed(context, 'home'); // Ir a la pantalla principal
+                            } catch (e) {
+                              Navigator.pop(context); // Quitar loading
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Error: ${agendaProvider.error ?? e.toString()}')),
+                              );
+                            }
                           }
                         },
+
                         style: Theme.of(context).elevatedButtonTheme.style,
                         child: Center(
                           child: Text('Iniciar Sesión', style: Theme.of(context).textTheme.labelMedium),

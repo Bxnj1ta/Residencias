@@ -73,12 +73,6 @@ class PerfilScreen extends StatelessWidget {
                       onTap: () {}),
                   OpcionesPerfilScreen(
                       icon: Icons.help, title: 'Ayuda y soporte', onTap: () {}),
-                  OpcionesPerfilScreen(
-                      icon: Icons.logout,
-                      title: 'Cerrar sesión',
-                      onTap: () {
-                        Navigator.pushNamed(context, 'login');
-                      }),
                 ],
               ),
             ),

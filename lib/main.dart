@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:residencias/providers/agenda_provider.dart';
 import 'routes/app_routes.dart';
 import 'package:residencias/themes/my_themes.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> setup() async {
   await dotenv.load(
@@ -17,7 +17,11 @@ Future<void> setup() async {
   );
 }
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); //login: se asegura que todo está inicializado
   await setup();
+  // Verificar si el usuario ya está logueado
+  final prefs = await SharedPreferences.getInstance(); //login: se obtiene si está logeado o no
+  final isLoggedIn = prefs.getBool('isLoggedIn') ?? false; //login: si no hay valor, se asume que no
   runApp(
     MultiProvider(
       providers: [
@@ -29,13 +33,14 @@ void main() async {
           },
         ),
       ],
-      child: const MyApp(),
+      child: MyApp(isLoggedIn: isLoggedIn),//login:se pasa el estado de login a toda la app
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+  const MyApp({super.key, required this.isLoggedIn});
 
   @override
   Widget build(BuildContext context) {
@@ -51,14 +56,14 @@ class MyApp extends StatelessWidget {
           ),
         );
         return MaterialApp(
-          title: 'Residencias',
           debugShowCheckedModeBanner: false,
-          initialRoute: AppRoutes.initialRoute,
-          routes: AppRoutes.routes,
-          onGenerateRoute: AppRoutes.onGenerateRoute,
+          title: 'Residencias',
           theme: MyTheme.light,
           darkTheme: MyTheme.dark,
           themeMode: ThemeMode.system,
+          initialRoute: isLoggedIn ? 'home' : 'login',//login: se salta el login
+          routes: AppRoutes.routes,
+          onGenerateRoute: AppRoutes.onGenerateRoute,
         );
       }
     );

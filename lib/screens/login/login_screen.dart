@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:residencias/ui/ui.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,6 +13,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _correoController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _recuerdame = false;
 
   String? _validarCorreo(String? value) {
     if (value == null || value.isEmpty) {
@@ -73,15 +75,45 @@ class _LoginScreenState extends State<LoginScreen> {
                       controller: _passwordController,
                       validator: (value) => (value == null || value.isEmpty) ? 'Ingresa la contraseña' : null,
                     ),
-                    const SizedBox(height: 30),
+
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text('Recuérdame'),
+                          Checkbox(
+                            value: _recuerdame,
+                            onChanged: (value) {
+                              setState(() {
+                                _recuerdame = value ?? false;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
 
                     SizedBox(
                       height: 60,
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            Navigator.pushNamed(context, 'home');
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) { //si no hay errores de validación
+                            //login: esto despues podría llamarse solo si se marca una casilla de "recordar sesión"
+                            final prefs = await SharedPreferences.getInstance();
+                            await prefs.setString('correo', _correoController.text);
+                            final nombre = _correoController.text.split('@')[0]; //por mientras no se decide campo nombre
+                            await prefs.setString('nombre', nombre);
+                            if (_recuerdame) {
+                              await prefs.setBool('isLoggedIn', true);
+                            } else {
+                              await prefs.remove('isLoggedIn');
+                            }
+                            if (!context.mounted) return;
+                            //pushReplacementNamed para "sustituir" login por home envez de poner uno encima del otro
+                            Navigator.pushReplacementNamed(context, 'home'); 
                           }
                         },
                         style: Theme.of(context).elevatedButtonTheme.style,

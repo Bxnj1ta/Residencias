@@ -41,6 +41,10 @@ class MyTheme {
     floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: light1, foregroundColor: dark1),
     outlinedButtonTheme: MyOutlinedButtonTheme.light,
     drawerTheme: MyDrawerTheme.light,
+    checkboxTheme: CheckboxThemeData(
+      fillColor: WidgetStateProperty.all(light1),
+      checkColor: WidgetStateProperty.all(dark1),
+    ),
   );
   static ThemeData dark = ThemeData(
     progressIndicatorTheme: ProgressIndicatorThemeData(color: light1),
@@ -66,5 +70,9 @@ class MyTheme {
     floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: dark2, foregroundColor: light1),
     outlinedButtonTheme: MyOutlinedButtonTheme.dark,
     drawerTheme: MyDrawerTheme.dark,
+    checkboxTheme: CheckboxThemeData(
+      fillColor: WidgetStateProperty.all(dark1),
+      checkColor: WidgetStateProperty.all(light1),
+    ),
   );
 }

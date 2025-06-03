@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:residencias/api/services/api_service.dart';
+import 'package:residencias/utils/blacklist.dart';
 
 class AgendaProvider extends ChangeNotifier {
   final ApiService api;
@@ -19,6 +20,10 @@ class AgendaProvider extends ChangeNotifier {
       final Set<String> latLngSet = {};
       residenciasUsuario = residencias.where((r) {
         final latLng = '${r['home_data_latitude']}${r['home_data_length']}';
+        final nombre = r['home_data_name']?.toString() ?? '';
+        if (!esNombreResidenciaPermitido(nombre)) {
+          return false;
+        }
         if (latLngSet.contains(latLng)) {
           return false;
         } else {

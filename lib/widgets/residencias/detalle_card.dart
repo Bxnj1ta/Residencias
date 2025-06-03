@@ -26,6 +26,9 @@ class _DetalleCardState extends State<DetalleCard> {
   static const String _msgErrorDistancia = 'No se pudo calcular la distancia.';
   static const String _msgFueraRango = 'Debes estar más cerca de la residencia.';
 
+  bool _cargando = false;
+  String? _estadoPrevio;
+
   @override
   void initState() {
     super.initState();
@@ -33,6 +36,10 @@ class _DetalleCardState extends State<DetalleCard> {
   }
 
   Future<void> _cambiarEstado() async {
+    setState(() {
+      _cargando = true;
+      _estadoPrevio = estado;
+    });
     final id = widget.residencia['home_clean_register_id'];
     bool ok = false;
     final bool? enRango = await estaEnRango();
@@ -41,10 +48,12 @@ class _DetalleCardState extends State<DetalleCard> {
 
     if (enRango == null) {
       _mostrarSnackBar(_msgErrorDistancia);
+      setState(() => _cargando = false);
       return;
     }
     if (!enRango) {
       _mostrarSnackBar(_msgFueraRango);
+      setState(() => _cargando = false);
       return;
     }
 
@@ -61,7 +70,10 @@ class _DetalleCardState extends State<DetalleCard> {
     if (ok) await context.read<AgendaProvider>().cargarAgenda();
     if (!mounted) return;
 
-    setState(() {});
+    setState(() {
+      _cargando = false;
+      _estadoPrevio = null;
+    });
 
     _mostrarSnackBar(
       ok
@@ -240,20 +252,20 @@ class _DetalleCardState extends State<DetalleCard> {
             ),
             const SizedBox(height: 16),
             OutlinedButton.icon( //Ingresar - Finalizar
-              onPressed: (puedeIngresar || puedeFinalizar) ? _cambiarEstado : null,
-              icon: Icon(
-                esPendiente 
-                  ? Icons.login 
-                  : Icons.check_circle, 
-              ),
+              onPressed: (_cargando || !(puedeIngresar || puedeFinalizar)) ? null : _cambiarEstado,
+              icon: _cargando
+                  ? SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2))
+                  : Icon(
+                      esPendiente 
+                        ? Icons.login 
+                        : Icons.check_circle, 
+                    ),
               label: Text(
-                esPendiente ? "Ingresar" 
-                : esProceso ? "Finalizar" 
-                : "Finalizado"),
-              // style: Theme.of(context).outlinedButtonTheme.style?.copyWith(
-              //   foregroundColor: WidgetStatePropertyAll(Theme.of(context).primaryColor),
-              //   backgroundColor: WidgetStatePropertyAll(Theme.of(context).floatingActionButtonTheme.foregroundColor),
-              // ),
+                _cargando
+                  ? (_estadoPrevio == 'Pendiente' ? "Ingresando..." : _estadoPrevio == 'Proceso' ? "Finalizando..." : "Finalizado")
+                  : (esPendiente ? "Ingresar" 
+                    : esProceso ? "Finalizar" 
+                    : "Finalizado")),
             ),
           ],
         ),

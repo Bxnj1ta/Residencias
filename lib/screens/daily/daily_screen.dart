@@ -19,11 +19,6 @@ class DailyScreen extends StatelessWidget {
         .firstWhere((r) => r['home_clean_register_state'] == 'Proceso', orElse: () => {});
 
         return Scaffold(
-          appBar: CustomAppBar(
-            titulo: 'Residencias del Día',
-            rightIcon: Icons.refresh,
-            onRightPressed: () => agenda.cargarAgenda(),
-          ),
           body: agenda.cargando
               ? Center(child: CircularProgressIndicator())
               : agenda.error != null

@@ -20,6 +20,20 @@ class MyInputTheme {
         width: 2,
       ),
     ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(30),
+      borderSide: BorderSide(
+        color: Colors.red,
+        width: 1.5,
+      ),
+    ),
+    focusedErrorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(30),
+      borderSide: BorderSide(
+        color: Colors.redAccent,
+        width: 2,
+      ),
+    ),
     filled: true,
     fillColor: MyTheme.light2,
     focusColor: MyTheme.light1
@@ -37,6 +51,20 @@ class MyInputTheme {
       borderRadius: BorderRadius.circular(30),
       borderSide: BorderSide(
         color: MyTheme.light2,
+        width: 2,
+      ),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(30),
+      borderSide: BorderSide(
+        color: Colors.red,
+        width: 1.5,
+      ),
+    ),
+    focusedErrorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(30),
+      borderSide: BorderSide(
+        color: Colors.redAccent,
         width: 2,
       ),
     ),

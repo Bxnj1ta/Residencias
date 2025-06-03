@@ -9,12 +9,16 @@ import 'package:residencias/widgets/mapa/map_markers_helper.dart';
 
 class MapaResidencias extends StatefulWidget {
   final gl.Position? initialPosition;
+  final double? initialCameraLat;
+  final double? initialCameraLng;
   final bool seguirUsuario;
   final bool permitirTapResidencia;
   final double? initialZoom;
   const MapaResidencias({
     super.key,
     this.initialPosition,
+    this.initialCameraLat,
+    this.initialCameraLng,
     this.seguirUsuario = true,
     this.permitirTapResidencia = true,
     this.initialZoom,
@@ -36,7 +40,9 @@ class _MapaResidenciasState extends State<MapaResidencias> {
   @override
   void initState() {
     super.initState();
+    debugPrint('INIT STATE MapaResidencias ${widget.initialPosition.toString()}');
     if (widget.initialPosition != null) {
+      debugPrint(widget.initialPosition.toString());
       _position = widget.initialPosition;
     }
     if (widget.seguirUsuario) {
@@ -120,6 +126,10 @@ class _MapaResidenciasState extends State<MapaResidencias> {
     mapboxMapController?.location.updateSettings(
       mp.LocationComponentSettings(enabled: true), // Sin layerAbove aquí
     );
+    // Ocultar la barra de escala (ft/m)
+    mapboxMapController?.scaleBar.updateSettings(
+      mp.ScaleBarSettings(enabled: false),
+    );
     if (widget.permitirTapResidencia) {
       mapboxMapController?.addInteraction(
         mp.TapInteraction(mp.FeaturesetDescriptor(layerId: "residencias-layer"),
@@ -171,7 +181,8 @@ class _MapaResidenciasState extends State<MapaResidencias> {
   void _onMapLoaded(mp.MapLoadedEventData _) async {
     _mapLoaded = true;
     final agenda = Provider.of<AgendaProvider>(context, listen: false);
-    if (_position != null && agenda.residenciasUsuario.isNotEmpty && mapboxMapController != null) {
+    // Agregar marcadores aunque _position sea null
+    if (agenda.residenciasUsuario.isNotEmpty && mapboxMapController != null) {
       await MapMarkersHelper.agregarGeoJsonSource(
         mapboxMapController: mapboxMapController!,
         residenciasUsuario: agenda.residenciasUsuario,
@@ -205,15 +216,19 @@ class _MapaResidenciasState extends State<MapaResidencias> {
   Widget build(BuildContext context) {
     _myContext = context;
     final agenda = Provider.of<AgendaProvider>(context);
-    if (_position == null || agenda.cargando) {
+    if (agenda.cargando) {
       return Center(child: CircularProgressIndicator(color: Theme.of(context).progressIndicatorTheme.color));
+    }
+    // Si seguirUsuario es false, no es obligatorio tener _position
+    if (widget.seguirUsuario && _position == null) {
+      return Center(child: Text('No se pudo obtener la ubicación inicial.'));
     }
     if (agenda.error != null) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Error al obtener agenda: ${agenda.error}'),
+            Text('Error al obtener agenda: \\${agenda.error}'),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => agenda.cargarAgenda(),
@@ -223,10 +238,27 @@ class _MapaResidenciasState extends State<MapaResidencias> {
         ),
       );
     }
+    // Detectar si el mapa fue abierto desde DetalleScreen
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final bool mostrarBotonAtras = args != null && args['desdeDetalle'] == true;
     final brightness = MediaQuery.of(context).platformBrightness;
     final styleUri = brightness == Brightness.dark ? mp.MapboxStyles.DARK : mp.MapboxStyles.LIGHT;
     final double zoom = widget.initialZoom ?? 14;
-        
+    final double? cameraLat = widget.initialCameraLat;
+    final double? cameraLng = widget.initialCameraLng;
+    // Calcular el centro de la cámara de forma robusta
+    mp.Position? cameraCenter;
+    if (cameraLat != null && cameraLng != null) {
+      cameraCenter = mp.Position(cameraLng, cameraLat);
+    } else if (_position != null) {
+      cameraCenter = mp.Position(_position!.longitude, _position!.latitude);
+    } else {
+      cameraCenter = null;
+    }
+
+    if (cameraCenter == null) {
+      return Center(child: Text('No hay coordenadas para mostrar el mapa.'));
+    }
     return Stack(
       children: [
         mp.MapWidget(
@@ -234,32 +266,46 @@ class _MapaResidenciasState extends State<MapaResidencias> {
           onMapLoadedListener: _onMapLoaded,
           styleUri: styleUri,
           cameraOptions: mp.CameraOptions(
-            center: mp.Point(
-              coordinates: mp.Position(_position!.longitude, _position!.latitude),
-            ),
+            center: mp.Point(coordinates: cameraCenter),
             zoom: zoom,
           ),
         ),
-        Positioned(
-          bottom: 16,
-          right: 16,
-          child: FloatingActionButton(
-            child: const Icon(Icons.my_location),
-            onPressed: () async {
-              if (_position != null && mapboxMapController != null) {
-                mapboxMapController?.flyTo(
-                  mp.CameraOptions(
-                    center: mp.Point(
-                      coordinates: mp.Position(_position!.longitude, _position!.latitude),
-                    ),
-                    zoom: 14,
-                  ),
-                  mp.MapAnimationOptions(duration: 1000),
-                );
-              }
-            },
+        if (mostrarBotonAtras)
+          Positioned(
+            top: 16,
+            left: 16,
+            child: FloatingActionButton(
+              heroTag: 'fab_atras',
+              shape: CircleBorder(),
+              child: const Icon(Icons.arrow_back, color: Colors.black),
+              onPressed: () {
+                  Navigator.of(context).pop();
+                },
+            ),
           ),
-        ),
+        if (!mostrarBotonAtras)
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: FloatingActionButton(
+              heroTag: 'fab_mylocation',
+              onPressed: (_position != null && mapboxMapController != null)
+                  ? () async {
+                      mapboxMapController?.flyTo(
+                        mp.CameraOptions(
+                          center: mp.Point(
+                            coordinates: mp.Position(_position!.longitude, _position!.latitude),
+                          ),
+                          zoom: 14,
+                        ),
+                        mp.MapAnimationOptions(duration: 1000),
+                      );
+                    }
+                  : null,
+              tooltip: 'Centrar en mi ubicación',
+              child: const Icon(Icons.my_location),
+            ),
+          ),
       ],
     );
   }

@@ -77,22 +77,26 @@ class _DetalleCardState extends State<DetalleCard> {
   }
 
   void mostrarMapa() async {
-    final lat = widget.residencia['home_data_latitude'];
-    final lng = widget.residencia['home_data_length'];
-    if (lat != null && lng != null) {
-      Navigator.pushNamed(
-        context,
-        'mapa',
-        arguments: {
-          'lat': lat,
-          'lng': lng,
-          'nombre': widget.residencia['home_data_name'],
-          'permitirTapResidencia': false,
-          'seguirUsuario': false,
-          'zoom': 17.0, // Zoom más alto
-        },
-      );
+    final latRaw = widget.residencia['home_data_latitude'];
+    final lngRaw = widget.residencia['home_data_length'];
+    final double? lat = latRaw is double ? latRaw : double.tryParse(latRaw.toString());
+    final double? lng = lngRaw is double ? lngRaw : double.tryParse(lngRaw.toString());
+    if (lat == null || lng == null) {
+      _mostrarSnackBar('No se pudo obtener la ubicación de la residencia.');
+      return;
     }
+    Navigator.pushNamed(
+      context,
+      'mapa',
+      arguments: {
+        'lat': lat,
+        'lng': lng,
+        'permitirTapResidencia': false, // para evitar loops
+        'seguirUsuario': false, // NO trakear usuario, solo centrar en residencia
+        'zoom': 18.0, // zoom centrado en la residencia
+        'desdeDetalle': true, // para mostrar botón atrás
+      },
+    );
   }
 
   void abrirRuta(double lat, double lng) async {

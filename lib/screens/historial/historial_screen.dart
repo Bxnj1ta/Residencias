@@ -16,11 +16,6 @@ class HistorialScreen extends StatelessWidget {
         
     
         return Scaffold(
-          appBar: CustomAppBar(
-            titulo: 'Residencias del Día',
-            rightIcon: Icons.refresh,
-            onRightPressed: () => agenda.cargarAgenda(),
-          ),
           body: agenda.cargando
               ? Center(child: CircularProgressIndicator())
               : agenda.error != null
@@ -42,25 +37,3 @@ class HistorialScreen extends StatelessWidget {
     );
   }
 }
-
-
-
-// Card(
-//   margin: const EdgeInsets.symmetric( horizontal: 16, vertical: 8, ),
-//   shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(30), ),
-//   child: ListTile(
-//     leading: const Icon(
-//       Icons.adjust,
-//       //Color amarillo para estados "en proceso", rojo para estados "pendiente"
-//       size: 34,
-//       color: Colors.yellow,
-//     ),
-//     title: Text(residencias[index]['nombre']!),
-//     subtitle: Text(residencias[index]['distancia']!),
-//     trailing: const Icon(Icons.chevron_right),
-//     contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-//     onTap: () {
-//       Navigator.pushNamed( context, 'detalle', arguments: residencias[index], );
-//     },
-//   ),
-// );

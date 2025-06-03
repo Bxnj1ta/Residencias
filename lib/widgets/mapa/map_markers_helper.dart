@@ -63,6 +63,18 @@ class MapMarkersHelper {
         cluster: true,
         clusterRadius: 50,
         clusterMaxZoom: 22,
+        // clusterProperties para propagar si hay una residencia en proceso (máximo una)
+        clusterProperties: {
+          'has_proceso': [
+            'max',
+            [
+              'case',
+                ["==", ["get", "estado"], "proceso"],
+                1,
+                0
+            ]
+          ]
+        },
       );
       await mapboxMapController.style.addSource(source);
 
@@ -71,7 +83,9 @@ class MapMarkersHelper {
         sourceId: "residencias-source",
         filter: ["has", "point_count"],
         circleColorExpression: [
-          "step", ["get", "point_count"], "#3fa7d6", 10, "#3fa7d6", 30, "#3fa7d6"
+          "case",
+            ["==", ["get", "has_proceso"], 1], "#fac05e", // amarillo si hay proceso
+            "#3fa7d6" // azul si no
         ],
         circleRadiusExpression: [
           "step", ["get", "point_count"], 18, 10, 22, 30, 28

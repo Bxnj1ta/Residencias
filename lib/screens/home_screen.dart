@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'screens.dart';
 import 'package:residencias/ui/custom_app_bar.dart';
+import 'package:residencias/ui/custom_drawer.dart';
+import 'package:provider/provider.dart';
+import 'package:residencias/providers/agenda_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,17 +27,14 @@ class _HomeScreenState extends State<HomeScreen> {
     {
       'titulo': 'Historial de residencias',
       'rightIcon': Icons.refresh,
-      'onRightPressed': null, // Se puede personalizar si se requiere
     },
     {
       'titulo': 'Residencias del día',
       'rightIcon': Icons.refresh,
-      'onRightPressed': null,
     },
     {
       'titulo': 'Residencias cercanas',
       'rightIcon': null,
-      'onRightPressed': null,
     },
   ];
 
@@ -44,14 +44,22 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void _refreshAgenda() {
+    // Busca el provider y recarga la agenda
+    final agendaProvider = context.read<AgendaProvider>();
+    agendaProvider.cargarAgenda();
+  }
+
   @override
   Widget build(BuildContext context) {
     final appBarConfig = _appBarConfigs[_selectedIndex];
+
     return Scaffold(
+      drawer: const CustomDrawer(),
       appBar: CustomAppBar(
         titulo: appBarConfig['titulo'],
         rightIcon: appBarConfig['rightIcon'],
-        onRightPressed: appBarConfig['onRightPressed'],
+        onRightPressed: _refreshAgenda,
         showDrawer: true,
       ),
       body: _pages[_selectedIndex],

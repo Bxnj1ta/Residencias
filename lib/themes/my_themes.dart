@@ -40,6 +40,7 @@ class MyTheme {
     splashColor: light1,
     floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: light1, foregroundColor: dark1),
     outlinedButtonTheme: MyOutlinedButtonTheme.light,
+    drawerTheme: MyDrawerTheme.light,
   );
   static ThemeData dark = ThemeData(
     progressIndicatorTheme: ProgressIndicatorThemeData(color: light1),
@@ -64,5 +65,6 @@ class MyTheme {
     splashColor: dark1,
     floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: dark2, foregroundColor: light1),
     outlinedButtonTheme: MyOutlinedButtonTheme.dark,
+    drawerTheme: MyDrawerTheme.dark,
   );
 }

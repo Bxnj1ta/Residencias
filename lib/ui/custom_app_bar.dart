@@ -41,7 +41,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         children: [
           //boton izq
           showDrawer
-            ? CustomIconButton(icon: Icons.menu, onPressed: () {},)
+            ? CustomIconButton(icon: Icons.menu, onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },)
             : CustomIconButton(icon: Icons.arrow_back, onPressed: () {Navigator.of(context).pop();},),
           //Título
           Expanded(
@@ -60,8 +62,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           //Boton derecho
           showRightIcon
             ? CustomIconButton(
-                icon: rightIcon ?? Icons.account_circle,
-                onPressed: onRightPressed ?? () {Navigator.pushNamed(context, 'perfil');},
+                icon: Icons.refresh,
+                onPressed: onRightPressed ?? () {},
               )
             : CustomIconButton(icon: Icons.close, onPressed: () {Navigator.of(context).pop();},),
         ],

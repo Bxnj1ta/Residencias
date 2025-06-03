@@ -12,6 +12,11 @@ class MyTheme {
     static final Color dark2 = primary.shade800;
     static final Color dark3 = primary.shade600;
 
+    static final Color blueMarker = Color.fromARGB(255, 63, 167, 214);    //Pendiente
+    static final Color yellowMarker = Color.fromARGB(255, 250, 192, 94);  //Proceso
+    static final Color greenMarker = Color.fromARGB(255, 89, 205, 144);   //Finalizado
+    static final Color redMarker = Color.fromARGB(255, 238, 99, 82);     //Cancelado (No definido)
+
   static ThemeData light = ThemeData(
     progressIndicatorTheme: ProgressIndicatorThemeData(color: dark1),
     useMaterial3: true,
@@ -24,7 +29,11 @@ class MyTheme {
     bottomNavigationBarTheme: MyBottomNavBarTheme.light,
     cardTheme: CardTheme(color: light2,),
     inputDecorationTheme: MyInputTheme.light,
-    textSelectionTheme: TextSelectionThemeData(cursorColor: dark1),
+    textSelectionTheme: TextSelectionThemeData(
+      cursorColor: dark1,
+      selectionColor: dark3,
+      selectionHandleColor: dark2,
+    ),
     iconTheme: IconThemeData(color: Colors.black),
     buttonTheme: MyButtonTheme.light,
     elevatedButtonTheme: MyElevatedButtonTheme.light,
@@ -44,7 +53,11 @@ class MyTheme {
     bottomNavigationBarTheme: MyBottomNavBarTheme.dark,
     cardTheme: CardTheme(color: dark2,),
     inputDecorationTheme: MyInputTheme.dark,
-    textSelectionTheme: TextSelectionThemeData(cursorColor: light1),
+    textSelectionTheme: TextSelectionThemeData(
+      cursorColor: light1,
+      selectionColor: light3,
+      selectionHandleColor: light2,
+    ),
     iconTheme: IconThemeData(color: Colors.white),
     buttonTheme: MyButtonTheme.dark,
     elevatedButtonTheme: MyElevatedButtonTheme.dark,

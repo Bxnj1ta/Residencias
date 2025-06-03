@@ -27,6 +27,7 @@ class CustomTextField extends StatelessWidget {
       obscureText: obscureText,
       keyboardType: keyboardType,
       validator: validator,
+      cursorColor: Theme.of(context).inputDecorationTheme.focusedBorder?.borderSide.color, // Color del cursor personalizado
       decoration: InputDecoration(
         hintText: hintText,
         prefixIcon: Icon(prefixIcon, color: Theme.of(context).iconTheme.color),

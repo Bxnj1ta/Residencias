@@ -5,12 +5,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String titulo;
   final bool showDrawer;
   final bool showRightIcon;
+  final VoidCallback? onRightPressed;
+  final IconData? rightIcon;
 
   const CustomAppBar({
     super.key,
     required this.titulo,
     this.showDrawer = true,
     this.showRightIcon = true,
+    this.onRightPressed,
+    this.rightIcon,
   });
 
   @override
@@ -55,7 +59,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     
           //Boton derecho
           showRightIcon
-            ? CustomIconButton(icon: Icons.account_circle, onPressed: () {Navigator.pushNamed(context, 'perfil');},)
+            ? CustomIconButton(
+                icon: rightIcon ?? Icons.account_circle,
+                onPressed: onRightPressed ?? () {Navigator.pushNamed(context, 'perfil');},
+              )
             : CustomIconButton(icon: Icons.close, onPressed: () {Navigator.of(context).pop();},),
         ],
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens.dart';
+import 'package:residencias/ui/custom_app_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,6 +19,25 @@ class _HomeScreenState extends State<HomeScreen> {
     MapaScreen(),      
   ];
 
+  // Configuración centralizada del AppBar para cada página
+  static final List<Map<String, dynamic>> _appBarConfigs = [
+    {
+      'titulo': 'Historial de residencias',
+      'rightIcon': Icons.refresh,
+      'onRightPressed': null, // Se puede personalizar si se requiere
+    },
+    {
+      'titulo': 'Residencias del día',
+      'rightIcon': Icons.refresh,
+      'onRightPressed': null,
+    },
+    {
+      'titulo': 'Residencias cercanas',
+      'rightIcon': null,
+      'onRightPressed': null,
+    },
+  ];
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -26,7 +46,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final appBarConfig = _appBarConfigs[_selectedIndex];
     return Scaffold(
+      appBar: CustomAppBar(
+        titulo: appBarConfig['titulo'],
+        rightIcon: appBarConfig['rightIcon'],
+        onRightPressed: appBarConfig['onRightPressed'],
+        showDrawer: true,
+      ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,

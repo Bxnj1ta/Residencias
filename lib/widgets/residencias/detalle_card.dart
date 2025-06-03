@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:residencias/providers/agenda_provider.dart';
 import 'package:residencias/themes/my_themes.dart';
@@ -18,6 +19,12 @@ class DetalleCard extends StatefulWidget {
 class _DetalleCardState extends State<DetalleCard> {
   final api = ApiService();
   late String estado;
+  Position? posicion;
+  double? distanciaMetros;
+
+  static const double _rangoPermitido = 30;
+  static const String _msgErrorDistancia = 'No se pudo calcular la distancia.';
+  static const String _msgFueraRango = 'Debes estar más cerca de la residencia.';
 
   @override
   void initState() {
@@ -25,17 +32,30 @@ class _DetalleCardState extends State<DetalleCard> {
     estado = widget.residencia['home_clean_register_state'].toString();
   }
 
-  void _cambiarEstado() async {
+  Future<void> _cambiarEstado() async {
     final id = widget.residencia['home_clean_register_id'];
     bool ok = false;
+    final bool? enRango = await estaEnRango();
+
+    if (!mounted) return;
+
+    if (enRango == null) {
+      _mostrarSnackBar(_msgErrorDistancia);
+      return;
+    }
+    if (!enRango) {
+      _mostrarSnackBar(_msgFueraRango);
+      return;
+    }
 
     if (estado == 'Pendiente') {
-    ok = await api.empezarResidencia(id);
-    if (ok) estado = 'Proceso';
-  } else if (estado == 'Proceso') {
-    ok = await api.finalizarResidencia(id);
-    if (ok) estado = 'Finalizado';
-  }
+      ok = await api.empezarResidencia(id);
+      if (ok) estado = 'Proceso';
+    } else if (estado == 'Proceso') {
+      ok = await api.finalizarResidencia(id);
+      if (ok) estado = 'Finalizado';
+    }
+
     if (!mounted) return;
 
     if (ok) await context.read<AgendaProvider>().cargarAgenda();
@@ -43,11 +63,39 @@ class _DetalleCardState extends State<DetalleCard> {
 
     setState(() {});
 
+    _mostrarSnackBar(
+      ok
+        ? 'Estado cambiado a ${estado.toLowerCase()}'
+        : 'Error al cambiar estado',
+    );
+  }
+
+  void _mostrarSnackBar(String mensaje) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(ok ?
-      'Estado cambiado a ${estado.toLowerCase()}'
-      :'Error al cambiar estado',
-      )),
+      SnackBar(content: Text(mensaje)),
+    );
+  }
+
+  void mostrarMapa() async {
+    final latRaw = widget.residencia['home_data_latitude'];
+    final lngRaw = widget.residencia['home_data_length'];
+    final double? lat = latRaw is double ? latRaw : double.tryParse(latRaw.toString());
+    final double? lng = lngRaw is double ? lngRaw : double.tryParse(lngRaw.toString());
+    if (lat == null || lng == null) {
+      _mostrarSnackBar('No se pudo obtener la ubicación de la residencia.');
+      return;
+    }
+    Navigator.pushNamed(
+      context,
+      'mapa',
+      arguments: {
+        'lat': lat,
+        'lng': lng,
+        'permitirTapResidencia': false, // para evitar loops
+        'seguirUsuario': false, // NO trakear usuario, solo centrar en residencia
+        'zoom': 18.0, // zoom centrado en la residencia
+        'desdeDetalle': true, // para mostrar botón atrás
+      },
     );
   }
 
@@ -57,11 +105,32 @@ class _DetalleCardState extends State<DetalleCard> {
     if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url));
     } else {
+      if (!mounted) return;
       debugPrint('No se pudo abrir: $url');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No se pudo abrir Google Maps')),
-      );
+      _mostrarSnackBar('No se pudo abrir Google Maps');
     }
+  }
+
+  Future<double?> _distancia(double lat, double lng) async {
+    try {
+      posicion = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
+      distanciaMetros = Geolocator.distanceBetween(
+        posicion!.latitude, posicion!.longitude, 
+        lat, lng
+      );
+      return distanciaMetros;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<bool?> estaEnRango() async {
+    final lat = widget.residencia['home_data_latitude'];
+    final lng = widget.residencia['home_data_length'];
+    double? distancia = await _distancia(lat, lng);
+    if (distancia == null) return null;
+    debugPrint('Distancia: ${distancia.toString()} m');
+    return distancia <= _rangoPermitido;
   }
   
   @override
@@ -148,8 +217,8 @@ class _DetalleCardState extends State<DetalleCard> {
               ],
             ),
             const SizedBox(height: 16),
-            Row( //mapa y direcciones
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            Row( //direcciones y mapa
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [ //despues refactorizar
                 OutlinedButton.icon(
                   onPressed: () {
@@ -162,7 +231,7 @@ class _DetalleCardState extends State<DetalleCard> {
                   style: Theme.of(context).outlinedButtonTheme.style,
                 ),
                 OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: mostrarMapa,
                   icon: Icon(Icons.map, color: Theme.of(context).iconTheme.color),
                   label: const Text("Ver en el mapa"),
                   style: Theme.of(context).outlinedButtonTheme.style,
@@ -170,7 +239,7 @@ class _DetalleCardState extends State<DetalleCard> {
               ],
             ),
             const SizedBox(height: 16),
-            OutlinedButton.icon(
+            OutlinedButton.icon( //Ingresar - Finalizar
               onPressed: (puedeIngresar || puedeFinalizar) ? _cambiarEstado : null,
               icon: Icon(
                 esPendiente 

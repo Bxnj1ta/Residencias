@@ -15,32 +15,64 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 1; //lo primero que muestra es el menu inicio
 
+  // Estado para el buscador y búsqueda
+  bool _mostrarBuscador = false;
+  String _busqueda = '';
+
   //POR SI DSP TENEMO QUE CAMBIAR LAS PAGINAS
-  static final List<Widget> _pages = <Widget>[
-    HistorialScreen(), 
-    DailyScreen(),    
-    MapaScreen(),      
+  // DailyScreen ahora recibe parámetros
+  List<Widget> get _pages => <Widget>[
+    HistorialScreen(
+      mostrarBuscador: _mostrarBuscador && _selectedIndex == 0,
+      busqueda: _selectedIndex == 0 ? _busqueda : '',
+      onBusquedaChanged: (value) {
+        if (_selectedIndex == 0) {
+          setState(() {
+            _busqueda = value;
+          });
+        }
+      },
+    ),
+    DailyScreen(
+      mostrarBuscador: _mostrarBuscador && _selectedIndex == 1,
+      busqueda: _selectedIndex == 1 ? _busqueda : '',
+      onBusquedaChanged: (value) {
+        if (_selectedIndex == 1) {
+          setState(() {
+            _busqueda = value;
+          });
+        }
+      },
+    ),
+    MapaScreen(),
   ];
 
   // Configuración centralizada del AppBar para cada página
-  static final List<Map<String, dynamic>> _appBarConfigs = [
+  List<Map<String, dynamic>> get _appBarConfigs => [
     {
       'titulo': 'Historial de residencias',
-      'rightIcon': Icons.refresh,
+      'iconA': Icons.refresh,
+      'iconB': Icons.search,
+      'actionB': _toggleBuscador,
     },
     {
       'titulo': 'Residencias del día',
-      'rightIcon': Icons.refresh,
+      'iconA': Icons.refresh,
+      'iconB': Icons.search,
+      'actionB': _toggleBuscador,
     },
     {
       'titulo': 'Residencias cercanas',
-      'rightIcon': null,
+      'iconA': Icons.refresh,
     },
   ];
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      // Limpiar búsqueda y ocultar buscador al cambiar de pestaña
+      _mostrarBuscador = false;
+      _busqueda = '';
     });
   }
 
@@ -48,6 +80,13 @@ class _HomeScreenState extends State<HomeScreen> {
     // Busca el provider y recarga la agenda
     final agendaProvider = context.read<AgendaProvider>();
     agendaProvider.cargarAgenda();
+  }
+
+  void _toggleBuscador() {
+    setState(() {
+      _mostrarBuscador = !_mostrarBuscador;
+      if (!_mostrarBuscador) _busqueda = '';
+    });
   }
 
   @override
@@ -58,8 +97,10 @@ class _HomeScreenState extends State<HomeScreen> {
       drawer: const CustomDrawer(),
       appBar: CustomAppBar(
         titulo: appBarConfig['titulo'],
-        rightIcon: appBarConfig['rightIcon'],
-        onRightPressed: _refreshAgenda,
+        iconA: appBarConfig['iconA'],
+        actionA: _refreshAgenda,
+        iconB: appBarConfig['iconB'],
+        actionB: appBarConfig['actionB'],
         showDrawer: true,
       ),
       body: _pages[_selectedIndex],

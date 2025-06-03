@@ -6,15 +6,45 @@ import 'package:residencias/widgets/residencias/sin_residencias.dart';
 import 'package:residencias/widgets/widgets.dart';
 
 class DailyScreen extends StatefulWidget {
-  const DailyScreen({super.key});
+  final bool mostrarBuscador;
+  final String busqueda;
+  final ValueChanged<String> onBusquedaChanged;
+
+  static void _defaultOnBusquedaChanged(String value) {}
+
+  const DailyScreen({
+    super.key,
+    this.mostrarBuscador = false,
+    this.busqueda = '',
+    this.onBusquedaChanged = _defaultOnBusquedaChanged,
+  });
 
   @override
   State<DailyScreen> createState() => _DailyScreenState();
 }
 
 class _DailyScreenState extends State<DailyScreen> {
-  String _busqueda = '';
-  bool _mostrarBuscador = false;
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.busqueda);
+  }
+
+  @override
+  void didUpdateWidget(DailyScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.busqueda != _controller.text) {
+      _controller.text = widget.busqueda;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,11 +56,11 @@ class _DailyScreenState extends State<DailyScreen> {
                 r['home_data_name']
                     .toString()
                     .toLowerCase()
-                    .contains(_busqueda.toLowerCase()) ||
+                    .contains(widget.busqueda.toLowerCase()) ||
                 r['home_data_address']
                     .toString()
                     .toLowerCase()
-                    .contains(_busqueda.toLowerCase()))
+                    .contains(widget.busqueda.toLowerCase()))
             .toList();
 
         final enProceso = agenda.residenciasUsuario.firstWhere(
@@ -39,61 +69,43 @@ class _DailyScreenState extends State<DailyScreen> {
         );
 
         return Scaffold(
-          appBar: AppBar(
-            title: Text('Búsqueda de residencias', style: TextStyle(fontSize: 20)),
-            actions: [
-              IconButton(
-                icon: Icon(Icons.search),
-                onPressed: () {
-                  setState(() {
-                    _mostrarBuscador = !_mostrarBuscador;
-                  });
-                },
-              ),
-            ],
-          ),
-          body: agenda.cargando
-              ? Center(child: CircularProgressIndicator())
-              : agenda.error != null
-                  ? ReintentarContainer(
-                      textError: 'Error al obtener agenda',
-                      error: agenda.error,
-                      onRetry: () => agenda.cargarAgenda(),
-                    )
-                  : agenda.residenciasUsuario.isEmpty
-                      ? SinResidencias()
-                      : Column(
-                          children: [
-                            if (_mostrarBuscador)
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                    hintText: 'Buscar por nombre o dirección',
-                                    prefixIcon: Icon(Icons.search),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+          body: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: agenda.cargando
+                ? Center(child: CircularProgressIndicator())
+                : agenda.error != null
+                    ? ReintentarContainer(
+                        textError: 'Error al obtener agenda',
+                        error: agenda.error,
+                        onRetry: () => agenda.cargarAgenda(),
+                      )
+                    : agenda.residenciasUsuario.isEmpty
+                        ? SinResidencias()
+                        : Column(
+                            children: [
+                              if (widget.mostrarBuscador)
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                                  child: TextField(
+                                    decoration: InputDecoration(
+                                      hintText: 'Buscar por nombre o dirección',
+                                      prefixIcon: Icon(Icons.search),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      filled: true,
+                                      fillColor: Colors.transparent,
                                     ),
-                                    filled: true,
-                                    fillColor: Colors.white,
+                                    onChanged: widget.onBusquedaChanged,
+                                    controller: _controller,
                                   ),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _busqueda = value;
-                                    });
-                                  },
                                 ),
-                              ),
-                            Expanded(
-                              child: ResidenciasLista(
-                                pendientes: residenciasPendientes,
-                                enProceso: enProceso,
-                              ),
-                            ),
-                          ],
-                        ),
+                              Expanded(child: ResidenciasLista( pendientes: residenciasPendientes, enProceso: enProceso)),
+                            ],
+                          ),
+          ),
         );
-
       },
     );
   }

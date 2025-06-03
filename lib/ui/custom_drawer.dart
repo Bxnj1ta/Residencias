@@ -61,7 +61,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
           ListTile(
             leading: Icon(Icons.person),
             title: const Text('Perfil'),
-            onTap: () => Navigator.pushNamed(context, 'perfil'),
+            onTap: () {},//() => Navigator.pushNamed(context, 'perfil')
           ),
           ListTile(
             leading: Icon(Icons.settings),

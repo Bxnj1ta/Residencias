@@ -7,7 +7,7 @@ class PerfilScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(titulo: 'Perfil', showDrawer: false,showRightIcon: false,),
+      appBar: const CustomAppBar(titulo: 'Perfil', showDrawer: false),
       body: SingleChildScrollView(
         child: Column(
           children: [

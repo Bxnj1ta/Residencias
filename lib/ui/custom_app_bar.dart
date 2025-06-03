@@ -4,17 +4,19 @@ import 'package:residencias/ui/ui.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String titulo;
   final bool showDrawer;
-  final bool showRightIcon;
-  final VoidCallback? onRightPressed;
-  final IconData? rightIcon;
+  final VoidCallback? actionA;
+  final IconData? iconA;
+  final VoidCallback? actionB;
+  final IconData? iconB;
 
   const CustomAppBar({
     super.key,
     required this.titulo,
     this.showDrawer = true,
-    this.showRightIcon = true,
-    this.onRightPressed,
-    this.rightIcon,
+    this.iconA,
+    this.actionA,
+    this.iconB,
+    this.actionB,
   });
 
   @override
@@ -59,13 +61,17 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
     
-          //Boton derecho
-          showRightIcon
-            ? CustomIconButton(
-                icon: Icons.refresh,
-                onPressed: onRightPressed ?? () {},
-              )
-            : CustomIconButton(icon: Icons.close, onPressed: () {Navigator.of(context).pop();},),
+          //Botones derecho
+          if (iconB != null && actionB != null) 
+            CustomIconButton(
+              icon: iconB!,
+              onPressed: actionB!,
+            ),
+          if (iconA != null && actionA != null) 
+            CustomIconButton(
+              icon: iconA!,
+              onPressed: actionA!,
+            ),
         ],
       ),
     );

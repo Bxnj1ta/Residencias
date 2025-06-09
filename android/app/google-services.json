@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "978432654578",
+    "project_id": "residencias-2bd60",
+    "storage_bucket": "residencias-2bd60.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:978432654578:android:e0d8c09121a2883fa5646b",
+        "android_client_info": {
+          "package_name": "AndroidManifest.xml"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQnbBZjCXmLtCTL2kNTx5JeiZr5zbnDw8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

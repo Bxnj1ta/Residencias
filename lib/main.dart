@@ -7,6 +7,7 @@ import 'package:residencias/providers/agenda_provider.dart';
 import 'routes/app_routes.dart';
 import 'package:residencias/themes/my_themes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 Future<void> setup() async {
   await dotenv.load(
@@ -18,6 +19,7 @@ Future<void> setup() async {
 }
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); //login: se asegura que todo está inicializado
+  await Firebase.initializeApp(); //Inicializar firebase
   await setup();
   // Verificar si el usuario ya está logueado
   final prefs = await SharedPreferences.getInstance(); //login: se obtiene si está logeado o no

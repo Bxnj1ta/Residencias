@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:residencias/ui/ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -101,19 +102,33 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: ElevatedButton(
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) { //si no hay errores de validación
-                            //login: esto despues podría llamarse solo si se marca una casilla de "recordar sesión"
-                            final prefs = await SharedPreferences.getInstance();
-                            await prefs.setString('correo', _correoController.text);
-                            final nombre = _correoController.text.split('@')[0]; //por mientras no se decide campo nombre
-                            await prefs.setString('nombre', nombre);
-                            if (_recuerdame) {
-                              await prefs.setBool('isLoggedIn', true);
-                            } else {
-                              await prefs.remove('isLoggedIn');
+                            try {
+                              final authResult = await FirebaseAuth.instance.signInWithEmailAndPassword(
+                                email: _correoController.text.trim(), 
+                                password: _passwordController.text.trim()
+                              );         
+                              //login: esto despues podría llamarse solo si se marca una casilla de "recordar sesión"
+                              final prefs = await SharedPreferences.getInstance();
+                              await prefs.setString('correo', _correoController.text);
+                              final nombre = _correoController.text.split('@')[0]; //por mientras no se decide campo nombre
+                              await prefs.setString('nombre', nombre);
+                              if (_recuerdame) {
+                                await prefs.setBool('isLoggedIn', true);
+                              } else {
+                                await prefs.remove('isLoggedIn');
+                              }
+                              if (!context.mounted) return;
+                              //pushReplacementNamed para "sustituir" login por home envez de poner uno encima del otro
+                              Navigator.pushReplacementNamed(context, 'home'); 
+                            } on FirebaseAuthException catch (e) {
+                              String mensaje = 'Error al iniciar sesión';
+                              if (e.code == 'user-not.found') {
+                                mensaje = 'Usuario no encontrado';
+                              } else if (e.code == 'wrong-password') {
+                                mensaje = 'Contrasela incorrecta';
+                              }
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensaje)));
                             }
-                            if (!context.mounted) return;
-                            //pushReplacementNamed para "sustituir" login por home envez de poner uno encima del otro
-                            Navigator.pushReplacementNamed(context, 'home'); 
                           }
                         },
                         style: Theme.of(context).elevatedButtonTheme.style,

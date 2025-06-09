@@ -32,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<List<dynamic>> _cargarUsuariosMock() async {
-    final String data = await rootBundle.loadString('lib/api/mocks/usuarios_mock.json');
+    final String data = await rootBundle.loadString('lib/assets/mocks/usuarios_mock.json');
     return json.decode(data);
   }
 

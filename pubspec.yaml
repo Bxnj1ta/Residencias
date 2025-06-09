@@ -70,6 +70,7 @@ flutter:
     - lib/assets/map/
     - lib/assets/icons/
     - lib/assets/image/imagen_login.jpg
+    - lib/assets/mocks/usuarios_mock.json
     - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see

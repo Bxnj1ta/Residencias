@@ -1,0 +1,17 @@
+[
+  {
+    "nombre": "Juan Perez",
+    "correo": "juan.perez@email.com",
+    "contrasena": "123456"
+  },
+  {
+    "nombre": "Maria Lopez",
+    "correo": "maria.lopez@email.com",
+    "contrasena": "abcdef"
+  },
+  {
+    "nombre": "Carlos Ruiz",
+    "correo": "carlos.ruiz@email.com",
+    "contrasena": "qwerty"
+  }
+]

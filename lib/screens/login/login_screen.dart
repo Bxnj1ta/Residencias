@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/material.dart';
 import 'package:residencias/ui/ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,6 +29,11 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     return null;
+  }
+
+  Future<List<dynamic>> _cargarUsuariosMock() async {
+    final String data = await rootBundle.loadString('lib/api/mocks/usuarios_mock.json');
+    return json.decode(data);
   }
 
   @override
@@ -100,20 +107,31 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () async {
-                          if (_formKey.currentState!.validate()) { //si no hay errores de validación
-                            //login: esto despues podría llamarse solo si se marca una casilla de "recordar sesión"
+                          if (_formKey.currentState!.validate()) {
+                            final usuarios = await _cargarUsuariosMock();
+                            final correo = _correoController.text;
+                            final contrasena = _passwordController.text;
+                            final usuario = usuarios.firstWhere(
+                              (u) => u['correo'] == correo && u['contrasena'] == contrasena,
+                              orElse: () => null,
+                            );
+                            if (!context.mounted) return;
+                            if (usuario == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Correo o contraseña incorrectos')),
+                              );
+                              return;
+                            }
                             final prefs = await SharedPreferences.getInstance();
-                            await prefs.setString('correo', _correoController.text);
-                            final nombre = _correoController.text.split('@')[0]; //por mientras no se decide campo nombre
-                            await prefs.setString('nombre', nombre);
+                            await prefs.setString('correo', usuario['correo']);
+                            await prefs.setString('nombre', usuario['nombre']);
                             if (_recuerdame) {
                               await prefs.setBool('isLoggedIn', true);
                             } else {
                               await prefs.remove('isLoggedIn');
                             }
                             if (!context.mounted) return;
-                            //pushReplacementNamed para "sustituir" login por home envez de poner uno encima del otro
-                            Navigator.pushReplacementNamed(context, 'home'); 
+                            Navigator.pushReplacementNamed(context, 'home');
                           }
                         },
                         style: Theme.of(context).elevatedButtonTheme.style,

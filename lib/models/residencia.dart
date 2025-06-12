@@ -2,6 +2,8 @@
 //
 //     final residencia = residenciaFromJson(jsonString);
 
+// archivo en deshuso, pero vale dejarlo para futuras implementaciones
+
 import 'dart:convert';
 
 Residencia residenciaFromJson(String str) => Residencia.fromJson(json.decode(str));

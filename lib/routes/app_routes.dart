@@ -9,7 +9,6 @@ class AppRoutes {
     'lista': (BuildContext context) => const DailyScreen(),
     'historial': (BuildContext context) => const HistorialScreen(),
     'mapa': (BuildContext context) => const MapaScreen(),
-    'perfil': (BuildContext context) => const PerfilScreen(),
     'detalle': (BuildContext context) => const DetalleScreen(),
   };
 

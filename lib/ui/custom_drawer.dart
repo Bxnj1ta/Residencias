@@ -58,16 +58,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             ),
           ),
           const SizedBox(height: 16),
-          ListTile(
-            leading: Icon(Icons.person),
-            title: const Text('Perfil'),
-            onTap: () {},//() => Navigator.pushNamed(context, 'perfil')
-          ),
-          ListTile(
-            leading: Icon(Icons.settings),
-            title: const Text('Configuración'),
-            onTap: () {},
-          ),
+          const Spacer(),
           ListTile(
             leading: Icon(Icons.logout, color: Colors.redAccent),
             title: const Text('Cerrar sesión'),
@@ -78,7 +69,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
               Navigator.pushNamedAndRemoveUntil(context, 'login', (route) => false); //limpia la navegación
             },
           ),
-          const Spacer(),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(

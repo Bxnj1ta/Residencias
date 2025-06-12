@@ -153,7 +153,6 @@ class _MapaResidenciasState extends State<MapaResidencias> {
         ( feature, context, ) async {
           if (feature.properties.containsKey('point_count')) {
             final coordinates = feature.geometry['coordinates'] as List?;
-            debugPrint("COOR $coordinates");
             if (coordinates != null && coordinates.length >= 2) {
               final lng = coordinates[0];
               final lat = coordinates[1];

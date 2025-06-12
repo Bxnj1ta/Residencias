@@ -118,7 +118,6 @@ class _DetalleCardState extends State<DetalleCard> {
       await launchUrl(Uri.parse(url));
     } else {
       if (!mounted) return;
-      debugPrint('No se pudo abrir: $url');
       _mostrarSnackBar('No se pudo abrir Google Maps');
     }
   }
@@ -141,7 +140,6 @@ class _DetalleCardState extends State<DetalleCard> {
     final lng = widget.residencia['home_data_length'];
     double? distancia = await _distancia(lat, lng);
     if (distancia == null) return null;
-    debugPrint('Distancia: ${distancia.toString()} m');
     return distancia <= _rangoPermitido;
   }
   
@@ -161,7 +159,6 @@ class _DetalleCardState extends State<DetalleCard> {
     final puedeIngresar = esPendiente && !hayEnProceso;
     final puedeFinalizar = esProceso && (idActual == idEnProceso);
 
-    debugPrint('residencia: ${widget.residencia}');
     return Card(
       margin: const EdgeInsets.all(24),
       elevation: 8,

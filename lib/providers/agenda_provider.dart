@@ -31,7 +31,6 @@ class AgendaProvider extends ChangeNotifier {
           return true;
         }
       }).toList();
-      debugPrint('Residencias del día: $residenciasUsuario');
     } catch (e) {
       error = e.toString();
     }

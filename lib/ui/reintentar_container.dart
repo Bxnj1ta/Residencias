@@ -18,7 +18,8 @@ class ReintentarContainer extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('$textError: ${error ?? "Desconocido"}'),
+          Text('$textError:'),
+          Text(error ?? "Desconocido"),
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: onRetry,

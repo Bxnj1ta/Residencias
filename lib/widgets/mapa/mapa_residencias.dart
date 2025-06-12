@@ -226,7 +226,8 @@ class _MapaResidenciasState extends State<MapaResidencias> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Error al obtener agenda: \\${agenda.error}'),
+            Text('Error al obtener agenda:'),
+            Text(agenda.error ?? "Desconocido"),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => agenda.cargarAgenda(),

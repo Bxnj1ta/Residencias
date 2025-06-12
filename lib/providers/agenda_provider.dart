@@ -32,7 +32,7 @@ class AgendaProvider extends ChangeNotifier {
         }
       }).toList();
     } catch (e) {
-      error = e.toString();
+      error = 'Ocurrió un error inesperado, comprueba tu conexión a internet.';
     }
     cargando = false;
     notifyListeners();

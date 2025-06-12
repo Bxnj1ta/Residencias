@@ -38,40 +38,49 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Stack(
+        alignment: Alignment.center,
         children: [
-          //boton izq
-          showDrawer
-            ? CustomIconButton(icon: Icons.menu, onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },)
-            : CustomIconButton(icon: Icons.arrow_back, onPressed: () {Navigator.of(context).pop();},),
-          //Título
-          Expanded(
-            child: Center(
-              child: Text(
-                titulo,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-                overflow: TextOverflow.ellipsis,
+          // Botón izquierdo
+          Align(
+            alignment: Alignment.centerLeft,
+            child: showDrawer
+              ? CustomIconButton(icon: Icons.menu, onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },)
+              : CustomIconButton(icon: Icons.arrow_back, onPressed: () {Navigator.of(context).pop();},),
+          ),
+          // Título centrado
+          Center(
+            child: Text(
+              titulo,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
               ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
           ),
-    
-          //Botones derecho
-          if (iconB != null && actionB != null) 
-            CustomIconButton(
-              icon: iconB!,
-              onPressed: actionB!,
+          // Botones derechos
+          Align(
+            alignment: Alignment.centerRight,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (iconB != null && actionB != null)
+                  CustomIconButton(
+                    icon: iconB!,
+                    onPressed: actionB!,
+                  ),
+                if (iconA != null && actionA != null)
+                  CustomIconButton(
+                    icon: iconA!,
+                    onPressed: actionA!,
+                  ),
+              ],
             ),
-          if (iconA != null && actionA != null) 
-            CustomIconButton(
-              icon: iconA!,
-              onPressed: actionA!,
-            ),
+          ),
         ],
       ),
     );
